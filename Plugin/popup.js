@@ -87,10 +87,32 @@ document.addEventListener('DOMContentLoaded', function() {
   getCurrentTab(function(tab) {
 
     // Display local storage
-    chrome.storage.sync.get(['xss','sql','lfi'], function(items) {
-      document.getElementById("xss").textContent = items['xss'] + " Cross Site Scripting";
-      document.getElementById("sql").textContent = items['sql'] + " Injection SQL";
-      document.getElementById("lfi").textContent = items['lfi'] + " Local File Inclusion";
+    chrome.storage.sync.get(['xss','sql','lfi','list'], function(items) {
+
+      // Display the list of vulns
+      var vulns = escape(items['list']).split('%7CDELIMITER%7C')
+      var i = 0;
+      vulns.forEach(function(y) 
+      { 
+          y = encodeURI(unescape(y));
+          if(y!==''){
+
+            var style = "";
+            if (i%2 == 1){
+              style = ' class="alt"';
+            }
+
+            document.getElementById('list').innerHTML += ('<tr'+style+'><td>XSS</td><td><a href="'+y+'">'+y.substring(0,150)+'</a></td></tr>');
+            i++;
+          }
+        
+      }
+      );
+
+      // Display vulnerabilities' count
+      document.getElementById("xss").textContent   = items['xss'] + " Cross Site Scripting";
+      document.getElementById("sql").textContent   = items['sql'] + " Injection SQL";
+      document.getElementById("lfi").textContent   = items['lfi'] + " Local File Inclusion";
       document.getElementById("total").textContent = "Total : "+ (items['lfi']+items['xss']+items['sql']) +" vulnerability found";
     });
 
@@ -111,20 +133,5 @@ document.addEventListener('DOMContentLoaded', function() {
           chrome.storage.sync.set({'work': 1});
         }
     });
-
-    // Second button ...
-    document.getElementById("export").addEventListener('click', () => {
-        function confirmation() {
-            //document.getElementById("debug").textContent = http_data.list;
-            alert('Not available yet..')
-        }
-        chrome.tabs.executeScript({code: '(' + confirmation + ')();'}, (results) => {
-          document.getElementById('status').textContent = results[0];
-        });
-    });
-
   });
-
 });
-
-

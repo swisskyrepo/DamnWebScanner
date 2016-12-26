@@ -37,6 +37,10 @@
       #debug{
         margin-top: 20px;
       }
+      #list{
+        display: none;
+        text-align: left;
+      }
     </style>
     <script src="popup.js"></script>
   </head>
@@ -59,7 +63,10 @@
     
     <!-- Used only to display debug informations-->
     <a href='#stop' id='stop'>STOP</a>
-    <a href='#export' id='export'>EXPORT</a>
-    <div id='debug'><span id='status'>Status Server</span></div>
+    <a href='./vulns.html' target=_blank id='export'>LIST</a>
+    <div id='debug'>
+      <span id='status'>Status Server</span>
+      <ul id='list'></ul>  
+    </div>
   </body>
 </html>

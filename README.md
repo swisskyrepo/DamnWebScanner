@@ -13,10 +13,11 @@ Currently it scans for:
 - Detect if the server is up
 - Start/Stop button
 - New XSS vectors, work in different contexts (JS var, JS function, inside HTML tag, outside HTML tag)
+- Basic page to list the vulnerabilities
 
 ## TODO - Work in progress
-- Get vuln list in localstorage (list)
 - ScanSQLTime/ScanSQLBlind
+- Should detect target in source code..
 - Should detect and work with POST requests
 - Export function for vulnerabilities
 - Add some functions from https://sergeybelove.ru/one-button-scan/result/3004e0b978f19e58e3239087d119742779e1efbc/

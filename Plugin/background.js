@@ -36,8 +36,15 @@ function send_target(server, url, deep, impact){
 
         // Notifications and update local storage
         if (http_data.xss != '0'){
+
+          // Update XSS count
 		      chrome.storage.sync.get(['xss'], function(items) {
             chrome.storage.sync.set({'xss': items['xss']+1})
+          });
+
+          // Update vulnerabilities URL list
+          chrome.storage.sync.get(['list'], function(items) {
+            chrome.storage.sync.set({'list': items['list']+http_data.list})
           });
 
           new Notification('New vulnerability detected !', {
@@ -47,8 +54,15 @@ function send_target(server, url, deep, impact){
         }
 
         if (http_data.sql != '0'){
+
+          // Update SQL count
           chrome.storage.sync.get(['sql'], function(items) {
             chrome.storage.sync.set({'sql': items['sql']+1})
+          });
+
+          // Update vulnerabilities URL list
+          chrome.storage.sync.get(['list'], function(items) {
+            chrome.storage.sync.set({'list': items['list']+http_data.list})
           });
 
           new Notification('New vulnerability detected !', {
@@ -58,8 +72,14 @@ function send_target(server, url, deep, impact){
         }
 
         if (http_data.lfi != '0'){
+          // Update LFI count
           chrome.storage.sync.get(['lfi'], function(items) {
             chrome.storage.sync.set({'lfi': items['lfi']+1})
+          });
+
+          // Update vulnerabilities URL list
+          chrome.storage.sync.get(['list'], function(items) {
+            chrome.storage.sync.set({'list': items['list']+http_data.list})
           });
 
           new Notification('New vulnerability detected !', {
@@ -75,7 +95,7 @@ function send_target(server, url, deep, impact){
 }
 
 // Set a clean local storage
-chrome.storage.sync.set({'xss': 0, 'sql': 0, 'lfi': 0, 'work': 1 })
+chrome.storage.sync.set({'xss': 0, 'sql': 0, 'lfi': 0, 'work': 1, 'list':'' })
 
 // Launch a scan when the tab change
 chrome.tabs.onActivated.addListener(function(activeInfo) {
