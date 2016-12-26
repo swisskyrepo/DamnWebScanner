@@ -28,7 +28,7 @@ def scan_xss(vulns, url, fuzz):
 			if result == '1':
 				print "\t\t\033[93mXSS Detected \033[0m for ", fuzz, " with the payload :", payload
 				vulns['xss']  += 1
-				vulns['list'] += inject+'|DELIMITER|'
+				vulns['list'] += 'XSS|TYPE|'+inject+'|DELIMITER|'
 			else:
 				print "\t\t\033[94mXSS Failed \033[0m for ", fuzz, " with the payload :", payload
 
@@ -40,7 +40,7 @@ def scan_xss(vulns, url, fuzz):
 Description: use a single quote to generate a SQL error in the page
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_sql(vulns, url, fuzz):
+def scan_sql_error(vulns, url, fuzz):
 	payload = "'"
 	inject  = url.replace(fuzz+"=", fuzz+"="+payload)
 	content = requests.get(inject).text
@@ -48,19 +48,20 @@ def scan_sql(vulns, url, fuzz):
 	if "Warning: SQLite3:" in content or "You have an error in your SQL syntax" in content:
 		print "\t\t\033[93mSQLi Detected \033[0m for ", fuzz, " with the payload :", payload
 		vulns['sql']  += 1
-		vulns['list'] += inject+'|DELIMITER|'
+		vulns['list'] += 'SQLi|TYPE|'+inject+'|DELIMITER|'
 	else:
 		print "\t\t\033[94mSQLi Failed \033[0m for ", fuzz, " with the payload :", payload
 
 
+"""scan_sql_blind_time
+Description: use a polyglot vector to detect a SQL injection based on the response time
+Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-TODO:ScanSQL TimeBased 1s
-IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1))/*'XOR(IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1)))OR'|"XOR(IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1)))OR"*/
-used in last in case of a WAF. Many things can trigger it..
-SLEEP(2) /*' or SLEEP(2) or '" or SLEEP(2) or "*/ 
-
-payload = "SleEP(2) /*' || SLeeP(2) || '\" || SLEep(2) || \"*/" 
-"""
+def scan_sql_blind_time(vulns, url, fuzz):
+	payload  = "SleEP(2) /*' || SLeeP(2) || '\" || SLEep(2) || \"*/" 
+	payload0 = "IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1))/*'XOR(IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1)))OR'|\"XOR(IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1)))OR\"*/"
+	# TODO
+	return
 
 
 
@@ -76,7 +77,7 @@ def scan_lfi(vulns, url, fuzz):
 	if "root:x:0:0:root:/root:/bin/bash" in content:
 		print "\t\t\033[93mLFI Detected \033[0m for ", fuzz, " with the payload :", payload
 		vulns['lfi']  += 1
-		vulns['list'] += inject+'|DELIMITER|'
+		vulns['list'] += 'LFI|TYPE|'+inject+'|DELIMITER|'
 	else:
 		print "\t\t\033[94mLFI Failed \033[0m for ", fuzz, " with the payload :", payload, inject
 
@@ -107,7 +108,8 @@ def index():
 		# Launch scans
 		for fuzz in matches:
 			scan_xss(vulns, url, fuzz)
-			scan_sql(vulns, url, fuzz)
+			scan_sql_error(vulns, url, fuzz)
+			scan_sql_blind_time(vulns, url, fuzz)
 			scan_lfi(vulns, url, fuzz)
 	
 	# Display results as a json

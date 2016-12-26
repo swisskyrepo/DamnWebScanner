@@ -1,6 +1,6 @@
 # Damn Web Scanner
 Another web vulnerabilities scanner, this extension works on Chrome and Opera
-The extension is working in the background and will notify you if it finds any vulnerability
+The extension is working on the background and will notify you if it finds any vulnerability
 
 Currently it scans for:
 - SQL Injection
@@ -13,17 +13,7 @@ Currently it scans for:
 - Detect if the server is up
 - Start/Stop button
 - New XSS vectors, work in different contexts (JS var, JS function, inside HTML tag, outside HTML tag)
-- Basic page to list the vulnerabilities
-
-## TODO - Work in progress
-- ScanSQLTime/ScanSQLBlind
-- Should detect target in source code..
-- Should detect and work with POST requests
-- Export function for vulnerabilities
-- Add some functions from https://sergeybelove.ru/one-button-scan/result/3004e0b978f19e58e3239087d119742779e1efbc/
-- Deep and impact : args['url'],args['deep'],args['impact']
-- Command injection :&sleep 5&'\"0&sleep 5&`'
-- Launch scan when a button is submitted
+- Basic page to list the vulnerabilities URL and TYPE
 
 ## Install
 You need to install and configure the server, it uses ghost and flask with gunicorn
@@ -49,6 +39,16 @@ chmod +x ./launch
 var config_server = "http://127.0.0.1:8000";
 ```
 4 - Browse the internet !
+
+## TODO - Work in progress
+- ScanSQLBlindTime function
+- Should detect target in source code..
+- Should detect and work with POST requests
+- Export function for vulnerabilities
+- Add some functions from https://sergeybelove.ru/one-button-scan/result/3004e0b978f19e58e3239087d119742779e1efbc/
+- Deep and impact : args['url'],args['deep'],args['impact']
+- Command injection :&sleep 5&'\"0&sleep 5&`'
+- Launch scan when a button is submitted
 
 ## Thanks
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)

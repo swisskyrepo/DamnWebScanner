@@ -97,12 +97,18 @@ document.addEventListener('DOMContentLoaded', function() {
           y = encodeURI(unescape(y));
           if(y!==''){
 
+            // Quick style, odd row will be blue
             var style = "";
             if (i%2 == 1){
               style = ' class="alt"';
             }
 
-            document.getElementById('list').innerHTML += ('<tr'+style+'><td>XSS</td><td><a href="'+y+'">'+y.substring(0,150)+'</a></td></tr>');
+            // Extract type of vuln e.g:XSS|TYPE|URL
+            y    = y.split('%7CTYPE%7C');
+            type = y[0];
+            y    = y[1];
+
+            document.getElementById('list').innerHTML += ('<tr'+style+'><td>'+type+'</td><td><a href="'+y+'">'+y.substring(0,150)+'</a></td></tr>');
             i++;
           }
         
