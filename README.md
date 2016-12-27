@@ -46,11 +46,10 @@ var config_server = "http://127.0.0.1:8000";
 - Should detect target in source code.. (list of targets, then launch scan)
 - Should detect and work with POST requests
 - Export function for vulnerabilities
-- Add some functions from https://sergeybelove.ru/one-button-scan/result/3004e0b978f19e58e3239087d119742779e1efbc/
 - Deep and impact : args['url'],args['deep'],args['impact']
-- Command injection :&sleep 5&'\"0&sleep 5&`'
-- Launch scan when a button is clicked/ form submitted / page opened via URL
-- LFI scan improvement with data: wrapper
+- Launch scan when a button is clicked/ form submitted / page opened via URL - chrome.tabs.onActivated.addListener
+- Cookies and User Agent in server request
+- BUG multiples vulns not added
 
 ## Thanks
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)

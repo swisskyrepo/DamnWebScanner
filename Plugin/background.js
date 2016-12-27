@@ -33,6 +33,7 @@ function send_target(server, url, deep, impact){
     http.onreadystatechange = function() {
       if (http.readyState == XMLHttpRequest.DONE) {
         http_data = JSON.parse(http.responseText);
+        console.log(http.responseText);
 
         // Notifications and update local storage
         if (http_data.xss != '0'){
@@ -88,6 +89,23 @@ function send_target(server, url, deep, impact){
           })();
         }
 
+        if (http_data.rce != '0'){
+          // Update RCE count
+          chrome.storage.sync.get(['rce'], function(items) {
+            chrome.storage.sync.set({'rce': items['rce']+parseInt(http_data.rce)})
+          });
+
+          // Update vulnerabilities URL list
+          chrome.storage.sync.get(['list'], function(items) {
+            chrome.storage.sync.set({'list': items['list']+http_data.list})
+          });
+
+          new Notification('New vulnerability detected !', {
+            icon: 'icon.png',
+            body: 'RCE on '+extract_domain(unescape(url))
+          })();
+        }
+
       }
     }
     http.open("GET", infos, true);
@@ -95,7 +113,7 @@ function send_target(server, url, deep, impact){
 }
 
 // Set a clean local storage
-chrome.storage.sync.set({'xss': 0, 'sql': 0, 'lfi': 0, 'work': 0, 'list':'' })
+chrome.storage.sync.set({'rce':0, 'xss': 0, 'sql': 0, 'lfi': 0, 'work': 0, 'list':'' })
 
 // Launch a scan when the tab change
 chrome.tabs.onActivated.addListener(function(activeInfo) {

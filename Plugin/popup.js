@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
   getCurrentTab(function(tab) {
 
     // Display local storage
-    chrome.storage.sync.get(['xss','sql','lfi','list','work'], function(items) {
+    chrome.storage.sync.get(['rce', 'xss','sql','lfi','list','work'], function(items) {
 
       // Update start button
       if (items['work'] == 0){
@@ -127,10 +127,11 @@ document.addEventListener('DOMContentLoaded', function() {
       );
 
       // Display vulnerabilities' count
+      document.getElementById("rce").textContent   = items['rce'] + " Remote Commands Execution";
       document.getElementById("xss").textContent   = items['xss'] + " Cross Site Scripting";
       document.getElementById("sql").textContent   = items['sql'] + " Injection SQL";
       document.getElementById("lfi").textContent   = items['lfi'] + " Local File Inclusion";
-      document.getElementById("total").textContent = "Total : "+ (items['lfi']+items['xss']+items['sql']) +" vulnerability found";
+      document.getElementById("total").textContent = "Total : "+ (items['lfi']+items['xss']+items['sql']+items['rce']) +" vulnerability found";
     });
 
     // Display infos (URL - Server's availability)
