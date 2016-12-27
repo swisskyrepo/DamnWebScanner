@@ -87,7 +87,18 @@ document.addEventListener('DOMContentLoaded', function() {
   getCurrentTab(function(tab) {
 
     // Display local storage
-    chrome.storage.sync.get(['xss','sql','lfi','list'], function(items) {
+    chrome.storage.sync.get(['xss','sql','lfi','list','work'], function(items) {
+
+      // Update start button
+      if (items['work'] == 0){
+        document.getElementById("stop").textContent = "START";
+        document.getElementById("stop").style = "background-image: -webkit-linear-gradient(top,#5cb85c,#4cae4c);";
+      }
+      else{
+        document.getElementById("stop").textContent = "STOP";
+        document.getElementById("stop").style = "background-image: -webkit-linear-gradient(top,#EA464A,#D43C40);";
+      }
+
 
       // Display the list of vulns
       var vulns = escape(items['list']).split('%7CDELIMITER%7C')
@@ -130,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("stop").addEventListener('click', () => {
         if(document.getElementById("stop").textContent == "STOP"){
           document.getElementById("stop").textContent = "START";
-          document.getElementById("stop").style = "background-image: -webkit-linear-gradient(top,#99EA46,#71D43C);";
+          document.getElementById("stop").style = "background-image: -webkit-linear-gradient(top,#5cb85c,#4cae4c);";
           chrome.storage.sync.set({'work': 0});
         }
         else{

@@ -7,7 +7,7 @@ Currently it scans for:
 - Cross Site Scripting
 - Local File Inclusion
 
-**Warnings :** Do not use this extension for illegal purpose, the main goal of it is to simplify the life of bug hunters. It's a BETA version, many improvements will come don't worry
+**Warnings :** Do not use this extension for illegal purpose, the main goal of it is to simplify the life of bug hunters. It's a **BETA version**, many improvements will come don't worry
 
 ## Install
 You need to install and configure the server, it uses ghost and flask with gunicorn
@@ -32,7 +32,7 @@ chmod +x ./launch
 ```
 var config_server = "http://127.0.0.1:8000";
 ```
-4 - Browse the internet !
+4 - Browse the internet ! (Don't forget to start the extension by clicking the 'START' button)
 
 ## New features
 - Detect if the server is up
@@ -40,7 +40,7 @@ var config_server = "http://127.0.0.1:8000";
 - New XSS vectors, work in different contexts (JS var, JS function, inside HTML tag, outside HTML tag)
 - Basic page to list the vulnerabilities URL and TYPE
 - Time based SQLi scanner using polyglot vectors (MySQL, SQLite, Oracle, Postgresql, SQL Server)
-- New logo for the plugin
+- New logo for the extension
 
 ## TODO - Work in progress
 - Should detect target in source code.. (list of targets, then launch scan)
@@ -49,7 +49,8 @@ var config_server = "http://127.0.0.1:8000";
 - Add some functions from https://sergeybelove.ru/one-button-scan/result/3004e0b978f19e58e3239087d119742779e1efbc/
 - Deep and impact : args['url'],args['deep'],args['impact']
 - Command injection :&sleep 5&'\"0&sleep 5&`'
-- Launch scan when a button is submitted
+- Launch scan when a button is clicked/ form submitted / page opened via URL
+- LFI scan improvement with data: wrapper
 
 ## Thanks
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)

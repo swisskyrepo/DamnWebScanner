@@ -95,7 +95,7 @@ function send_target(server, url, deep, impact){
 }
 
 // Set a clean local storage
-chrome.storage.sync.set({'xss': 0, 'sql': 0, 'lfi': 0, 'work': 1, 'list':'' })
+chrome.storage.sync.set({'xss': 0, 'sql': 0, 'lfi': 0, 'work': 0, 'list':'' })
 
 // Launch a scan when the tab change
 chrome.tabs.onActivated.addListener(function(activeInfo) {
