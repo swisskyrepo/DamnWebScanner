@@ -33,21 +33,22 @@ function send_target(server, url, deep, impact){
     http.onreadystatechange = function() {
       if (http.readyState == XMLHttpRequest.DONE) {
         http_data = JSON.parse(http.responseText);
-        console.log(http.responseText);
 
-        // Notifications and update local storage
+        // Update vulns count
+        chrome.storage.sync.get(['rce','xss','lfi','sql'], function(items) {
+            chrome.storage.sync.set({'rce': items['rce']+parseInt(http_data.rce)});
+            chrome.storage.sync.set({'xss': items['xss']+parseInt(http_data.xss)});
+            chrome.storage.sync.set({'lfi': items['lfi']+parseInt(http_data.lfi)});
+            chrome.storage.sync.set({'sql': items['sql']+parseInt(http_data.sql)});
+        });
+
+        // Update vulnerabilities URL list
+        chrome.storage.sync.get(['list'], function(items) {
+           chrome.storage.sync.set({'list': items['list']+http_data.list})
+        });
+
+        // Notifications 
         if (http_data.xss != '0'){
-
-          // Update XSS count
-		      chrome.storage.sync.get(['xss'], function(items) {
-            chrome.storage.sync.set({'xss': items['xss']+parseInt(http_data.xss)})
-          });
-
-          // Update vulnerabilities URL list
-          chrome.storage.sync.get(['list'], function(items) {
-            chrome.storage.sync.set({'list': items['list']+http_data.list})
-          });
-
           new Notification('New vulnerability detected !', {
             icon: 'icon.png',
             body: 'XSS on '+extract_domain(unescape(url))
@@ -55,17 +56,6 @@ function send_target(server, url, deep, impact){
         }
 
         if (http_data.sql != '0'){
-
-          // Update SQL count
-          chrome.storage.sync.get(['sql'], function(items) {
-            chrome.storage.sync.set({'sql': items['sql']+parseInt(http_data.sql)})
-          });
-
-          // Update vulnerabilities URL list
-          chrome.storage.sync.get(['list'], function(items) {
-            chrome.storage.sync.set({'list': items['list']+http_data.list})
-          });
-
           new Notification('New vulnerability detected !', {
             icon: 'icon.png',
             body: 'SQLi on '+extract_domain(unescape(url))
@@ -73,16 +63,6 @@ function send_target(server, url, deep, impact){
         }
 
         if (http_data.lfi != '0'){
-          // Update LFI count
-          chrome.storage.sync.get(['lfi'], function(items) {
-            chrome.storage.sync.set({'lfi': items['lfi']+parseInt(http_data.lfi)})
-          });
-
-          // Update vulnerabilities URL list
-          chrome.storage.sync.get(['list'], function(items) {
-            chrome.storage.sync.set({'list': items['list']+http_data.list})
-          });
-
           new Notification('New vulnerability detected !', {
             icon: 'icon.png',
             body: 'LFI on '+extract_domain(unescape(url))
@@ -90,16 +70,6 @@ function send_target(server, url, deep, impact){
         }
 
         if (http_data.rce != '0'){
-          // Update RCE count
-          chrome.storage.sync.get(['rce'], function(items) {
-            chrome.storage.sync.set({'rce': items['rce']+parseInt(http_data.rce)})
-          });
-
-          // Update vulnerabilities URL list
-          chrome.storage.sync.get(['list'], function(items) {
-            chrome.storage.sync.set({'list': items['list']+http_data.list})
-          });
-
           new Notification('New vulnerability detected !', {
             icon: 'icon.png',
             body: 'RCE on '+extract_domain(unescape(url))

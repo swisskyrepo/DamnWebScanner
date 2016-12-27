@@ -49,7 +49,6 @@ var config_server = "http://127.0.0.1:8000";
 - Deep and impact : args['url'],args['deep'],args['impact']
 - Launch scan when a button is clicked/ form submitted / page opened via URL - chrome.tabs.onActivated.addListener
 - Cookies and User Agent in server request
-- BUG multiples vulns not added
 
 ## Thanks
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)
