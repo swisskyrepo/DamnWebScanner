@@ -14,6 +14,7 @@ Currently it scans for:
 - Start/Stop button
 - New XSS vectors, work in different contexts (JS var, JS function, inside HTML tag, outside HTML tag)
 - Basic page to list the vulnerabilities URL and TYPE
+- Time based SQLi scanner using polyglot vectors (MySQL, SQLite, Oracle, Postgresql, SQL Server)
 
 ## Install
 You need to install and configure the server, it uses ghost and flask with gunicorn
@@ -41,8 +42,7 @@ var config_server = "http://127.0.0.1:8000";
 4 - Browse the internet !
 
 ## TODO - Work in progress
-- ScanSQLBlindTime function
-- Should detect target in source code..
+- Should detect target in source code.. (list of targets, then launch scan)
 - Should detect and work with POST requests
 - Export function for vulnerabilities
 - Add some functions from https://sergeybelove.ru/one-button-scan/result/3004e0b978f19e58e3239087d119742779e1efbc/

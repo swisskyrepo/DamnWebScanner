@@ -39,7 +39,7 @@ function send_target(server, url, deep, impact){
 
           // Update XSS count
 		      chrome.storage.sync.get(['xss'], function(items) {
-            chrome.storage.sync.set({'xss': items['xss']+1})
+            chrome.storage.sync.set({'xss': items['xss']+parseInt(http_data.xss)})
           });
 
           // Update vulnerabilities URL list
@@ -57,7 +57,7 @@ function send_target(server, url, deep, impact){
 
           // Update SQL count
           chrome.storage.sync.get(['sql'], function(items) {
-            chrome.storage.sync.set({'sql': items['sql']+1})
+            chrome.storage.sync.set({'sql': items['sql']+parseInt(http_data.sql)})
           });
 
           // Update vulnerabilities URL list
@@ -74,7 +74,7 @@ function send_target(server, url, deep, impact){
         if (http_data.lfi != '0'){
           // Update LFI count
           chrome.storage.sync.get(['lfi'], function(items) {
-            chrome.storage.sync.set({'lfi': items['lfi']+1})
+            chrome.storage.sync.set({'lfi': items['lfi']+parseInt(http_data.lfi)})
           });
 
           // Update vulnerabilities URL list
