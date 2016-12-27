@@ -9,13 +9,6 @@ Currently it scans for:
 
 **Warnings :** Do not use this extension for illegal purpose, the main goal of it is to simplify the life of bug hunters. It's a BETA version, many improvements will come don't worry
 
-## New features
-- Detect if the server is up
-- Start/Stop button
-- New XSS vectors, work in different contexts (JS var, JS function, inside HTML tag, outside HTML tag)
-- Basic page to list the vulnerabilities URL and TYPE
-- Time based SQLi scanner using polyglot vectors (MySQL, SQLite, Oracle, Postgresql, SQL Server)
-
 ## Install
 You need to install and configure the server, it uses ghost and flask with gunicorn
 ```
@@ -40,6 +33,14 @@ chmod +x ./launch
 var config_server = "http://127.0.0.1:8000";
 ```
 4 - Browse the internet !
+
+## New features
+- Detect if the server is up
+- Start/Stop button
+- New XSS vectors, work in different contexts (JS var, JS function, inside HTML tag, outside HTML tag)
+- Basic page to list the vulnerabilities URL and TYPE
+- Time based SQLi scanner using polyglot vectors (MySQL, SQLite, Oracle, Postgresql, SQL Server)
+- New logo for the plugin
 
 ## TODO - Work in progress
 - Should detect target in source code.. (list of targets, then launch scan)
