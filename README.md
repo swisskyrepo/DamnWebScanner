@@ -46,11 +46,11 @@ You can try the Error SQL, Blind SQL, LFI with Damn Vulnerable Web App
 - New logo for the extension
 - Re-use your cookies and user-agent to get access to page with cookie-authentication 
 - Export vulnerabilities into a CSV file
+- Launch scan when a form is submitted or a page is opened via the URL bar
 
 ## TODO - Work in progress
 - Should detect target in source code.. (list of targets, then launch scan)
 - Should detect and work with POST requests
-- Launch scan when a button is clicked/ form submitted / page opened via URL - chrome.tabs.onActivated.addListener onFormSubmit?
 
 ## Thanks
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)

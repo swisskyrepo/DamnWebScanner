@@ -85,26 +85,31 @@ function send_target(server, url, deep, impact, cookies){
 // Set a clean local storage
 chrome.storage.sync.set({'rce':0, 'xss': 0, 'sql': 0, 'lfi': 0, 'work': 0, 'list':'' })
 
-// Launch a scan when the tab change
-chrome.tabs.onActivated.addListener(function(activeInfo) {
-	chrome.tabs.get(activeInfo.tabId, function(tab){
 
-		// Handle start/stop button
-    chrome.storage.sync.get(['work'], function(items) {
-      if(items['work'] == 1){
+// Launch a scan when the tab change - Submit a form / Open new URL from bar 
+chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
+  
+  if(changeInfo.status == 'complete'){
+    chrome.tabs.get(tabId, function(tab){
 
-        // Extract cookies from the domain
-        var cookies_string = "";  
-        chrome.cookies.getAll({ 'domain': extract_domain(tab.url)}, function(cookies) {
-          for (var i = 0; i < cookies.length; i++) {
-           cookies_string += ("name:" + cookies[i].name + "|value:" + cookies[i].value+"\n");
-          }
+      // Handle start/stop button
+      chrome.storage.sync.get(['work'], function(items) {
+        if(items['work'] == 1){
 
-          // Start a scan with the url and the cookies
-          send_target(config_server, escape(tab.url), 0, 0, escape((cookies_string)) );
-        });
-      }
+          // Extract cookies from the domain
+          var cookies_string = "";  
+          chrome.cookies.getAll({ 'domain': extract_domain(tab.url)}, function(cookies) {
+            for (var i = 0; i < cookies.length; i++) {
+             cookies_string += ("name:" + cookies[i].name + "|value:" + cookies[i].value+"\n");
+            }
 
+            // Start a scan with the url and the cookies
+            send_target(config_server, escape(tab.url), 0, 0, escape((cookies_string)) );
+          });
+        }
+
+      });
     });
-	});
+  }
+  
 });
