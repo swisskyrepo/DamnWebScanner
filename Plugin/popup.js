@@ -85,6 +85,7 @@ function status_server(config_server){
 document.addEventListener('DOMContentLoaded', function() {
 
   getCurrentTab(function(tab) {
+    var vulns_csv = "Type,Vulnerability\n";
 
     // Display local storage
     chrome.storage.sync.get(['rce', 'xss','sql','lfi','list','work'], function(items) {
@@ -98,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById("stop").textContent = "STOP";
         document.getElementById("stop").style = "background-image: -webkit-linear-gradient(top,#EA464A,#D43C40);";
       }
-
 
       // Display the list of vulns
       var vulns = escape(items['list']).split('%7CDELIMITER%7C')
@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             y    = y[1];
 
             document.getElementById('list').innerHTML += ('<tr'+style+'><td>'+type+'</td><td><a href="'+y+'">'+y.substring(0,150)+'</a></td></tr>');
+            vulns_csv += type+","+y+"\n";
             i++;
           }
         
@@ -151,5 +152,11 @@ document.addEventListener('DOMContentLoaded', function() {
           chrome.storage.sync.set({'work': 1});
         }
     });
+
+    // Export button - save a CSV file with all the vulnerabilities
+    document.getElementById("export").addEventListener('click', () => {
+      window.open('data:text/csv;charset=utf-8,' + escape(vulns_csv));
+    });
+
   });
 });

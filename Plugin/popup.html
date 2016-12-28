@@ -15,7 +15,7 @@
       #info {
         text-align: left;
       }
-      #stop,#export{
+      #stop,#refresh{
         width: 100px;
         padding: 8px;
         display: inline-block;
@@ -30,14 +30,18 @@
         font-weight: bold;
         line-height: 30px;
         box-shadow: 0px 2px 0px #553634, 0px 3px 3px #888;
+        opacity: 1;
       }
-      #export{
+      #stop:hover, #refresh:hover{
+        opacity: 0.9;
+      }
+      #refresh{
         background-image: -webkit-linear-gradient(top,#00BFA5,#26A69A);
       }
       #debug{
         margin-top: 20px;
       }
-      #list{
+      #list,#export{
         display: none;
         text-align: left;
       }
@@ -64,7 +68,8 @@
     
     <!-- Used only to display debug informations-->
     <a href='#stop' id='stop'>START</a>
-    <a href='./vulns.html' target=_blank id='export'>LIST</a>
+    <a href='./vulns.html' target=_blank id='refresh'>LIST</a>
+    <a href='#export' id='export'>EXPORT</a>
     <div id='debug'>
       <span id='status'>Status Server</span>
       <ul id='list'></ul>  

@@ -17,7 +17,7 @@
         margin: 0 auto;
         text-align: left;
       }
-      #stop,#export{
+      #stop, #export, #refresh{
         width: 100px;
         padding: 8px;
         display: inline-block;
@@ -32,8 +32,15 @@
         font-weight: bold;
         line-height: 30px;
         box-shadow: 0px 2px 0px #553634, 0px 3px 3px #888;
+        opacity: 1;
+      }
+      #stop:hover, #export:hover, #refresh:hover{
+        opacity: 0.9;
       }
       #export{
+        background-image: -webkit-linear-gradient(top,#42A5F5,#2196F3);
+      }
+      #refresh{
         background-image: -webkit-linear-gradient(top,#00BFA5,#26A69A);
       }
       #debug{
@@ -91,7 +98,8 @@
 
     <!-- Used only to display debug informations-->
     <a href='#stop' id='stop'>START</a>
-    <a href='./vulns.html' id='export'>LIST</a>
+    <a href='./vulns.html' id='refresh'>REFRESH</a>
+    <a href='#export' id='export'>EXPORT</a>
     <div id='debug'>
       <span id='status'>Status Server</span>
     </div>

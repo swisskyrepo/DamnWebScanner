@@ -34,6 +34,7 @@ chmod +x ./launch
 var config_server = "http://127.0.0.1:8000";
 ```
 4 - Browse the internet ! (Don't forget to start the extension by clicking the 'START' button)
+You can try the Error SQL, Blind SQL, LFI with Damn Vulnerable Web App 
 
 ## New features
 - Detect if the server is up
@@ -41,15 +42,15 @@ var config_server = "http://127.0.0.1:8000";
 - New XSS vectors, work in different contexts (JS var, JS function, inside HTML tag, outside HTML tag)
 - Basic page to list the vulnerabilities URL and TYPE
 - Time based SQLi scanner using polyglot vectors (MySQL, SQLite, Oracle, Postgresql, SQL Server)
+- RCE scanner using polyglot vectors based on time
 - New logo for the extension
 - Re-use your cookies and user-agent to get access to page with cookie-authentication 
+- Export vulnerabilities into a CSV file
 
 ## TODO - Work in progress
 - Should detect target in source code.. (list of targets, then launch scan)
 - Should detect and work with POST requests
-- Export function for vulnerabilities
-- Deep and impact : args['url'],args['deep'],args['impact']
-- Launch scan when a button is clicked/ form submitted / page opened via URL - chrome.tabs.onActivated.addListener
+- Launch scan when a button is clicked/ form submitted / page opened via URL - chrome.tabs.onActivated.addListener onFormSubmit?
 
 ## Thanks
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)
