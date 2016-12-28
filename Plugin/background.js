@@ -25,9 +25,9 @@ function extract_domain(url){
  * @param string(impact) - aggressivity of the scan from 0 to 5
  *
  */
-function send_target(server, url, deep, impact){
+function send_target(server, url, deep, impact, cookies){
     var http = new XMLHttpRequest();
-    infos = server + "/?url=" + url + "&deep="+ deep + "&impact=" + impact
+    infos = server + "/?url=" + url + "&deep="+ deep + "&impact=" + impact + "&cookies=" + cookies
 
     // Display the informations sent by the scanner
     http.onreadystatechange = function() {
@@ -92,9 +92,19 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 		// Handle start/stop button
     chrome.storage.sync.get(['work'], function(items) {
       if(items['work'] == 1){
-        send_target(config_server, escape(tab.url), 0, 0);
-      }
-    });
 
+        // Extract cookies from the domain
+        var cookies_string = "";  
+        chrome.cookies.getAll({ 'domain': extract_domain(tab.url)}, function(cookies) {
+          for (var i = 0; i < cookies.length; i++) {
+           cookies_string += ("name:" + cookies[i].name + "|value:" + cookies[i].value+"\n");
+          }
+
+          // Start a scan with the url and the cookies
+          send_target(config_server, escape(tab.url), 0, 0, escape((cookies_string)) );
+        });
+      }
+
+    });
 	});
 });

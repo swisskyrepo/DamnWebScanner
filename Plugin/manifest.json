@@ -21,7 +21,10 @@
     "activeTab",
     "tabs",
     "notifications",
-    "storage"
+    "storage",
+    "cookies",
+    "http://*/*", 
+    "https://*/*" 
   ],
 
   // Script files
@@ -34,6 +37,7 @@
 
   // Background script to catch new/updated tab
   "background": {
+    "matches": ["<all_urls>"],
     "scripts": ["background.js"]
   }
 

