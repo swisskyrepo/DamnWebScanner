@@ -27,7 +27,7 @@ function extract_domain(url){
  */
 function send_target(server, url, deep, impact, cookies){
     var http = new XMLHttpRequest();
-    infos = server + "/?url=" + url + "&deep="+ deep + "&impact=" + impact + "&cookies=" + cookies
+    infos = server + "/?url=" + url + "&deep="+ deep + "&impact=" + impact + "&cookies=" + cookies + "&useragent=" + navigator.userAgent;
 
     // Display the informations sent by the scanner
     http.onreadystatechange = function() {

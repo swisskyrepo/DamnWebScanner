@@ -42,7 +42,7 @@ var config_server = "http://127.0.0.1:8000";
 - Basic page to list the vulnerabilities URL and TYPE
 - Time based SQLi scanner using polyglot vectors (MySQL, SQLite, Oracle, Postgresql, SQL Server)
 - New logo for the extension
-- Re-use your cookies to get access to page with cookie-authentication 
+- Re-use your cookies and user-agent to get access to page with cookie-authentication 
 
 ## TODO - Work in progress
 - Should detect target in source code.. (list of targets, then launch scan)
@@ -50,7 +50,6 @@ var config_server = "http://127.0.0.1:8000";
 - Export function for vulnerabilities
 - Deep and impact : args['url'],args['deep'],args['impact']
 - Launch scan when a button is clicked/ form submitted / page opened via URL - chrome.tabs.onActivated.addListener
-- User Agent in server request
 
 ## Thanks
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)
