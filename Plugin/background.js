@@ -114,9 +114,9 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
               post_data += (document.forms[i-1].elements[j].name+":"+document.forms[i-1].elements[j].value+"|");
             }
 
-            // Send data to this plugin (POST Scan)
-            if(post_data != ''){
-              console.log(post_data);
+            // Send data to this plugin (POST Scan) - check the method, GET is already handle with onUpdated
+            if(post_data != '' && document.forms[i-1].method.toUpperCase() == 'POST'){
+              console.log(post_data); 
               chrome.runtime.sendMessage({type: "scan_plz", data:post_data, url:document.location.href, cookie:document.cookie}, function() {});
             }
         });
