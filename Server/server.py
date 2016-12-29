@@ -163,33 +163,62 @@ def index():
 	args      = request.args
 	url       = args['url']
 	useragent = args['useragent']
+	methods   = args['method']
+	data      = args['data']
 	
-	# Parse cookies strings - string like name:username|value:admin
-	cookies_requests = {}
-	cookies_ghost    = ""
-	for cookie in args['cookies'].split('\n'):
-
-		c = cookie.split('|')
-		if c != '' and c != None:
-			if len(c) != 1:
-				name  = str(c[0]).replace('name:','')
-				value = str(c[1]).replace('value:','')
-				cookies_requests[name] = value
-				cookies_ghost += " "+cookie.replace('name:','').replace('value:','=').replace('|','') + ";"
-
+	# Parse args for GET
 	if "?" in url:
+
+		# Parse cookies strings - string like name:username|value:admin
+		cookies_requests = {}
+		cookies_ghost    = ""
+		for cookie in args['cookies'].split('\n'):
+
+			c = cookie.split('|')
+			if c != '' and c != None:
+				if len(c) != 1:
+					name  = str(c[0]).replace('name:','')
+					value = str(c[1]).replace('value:','')
+					cookies_requests[name] = value
+					cookies_ghost += " "+cookie.replace('name:','').replace('value:','=').replace('|','') + ";"
+
+		# Parse url	
 		params  = url.split('?')[1]
 		regex   = re.compile('([a-zA-Z0-9\-_]*?)=')
 		matches = regex.findall(params)
 
 		# Launch scans
 		for fuzz in matches:
-			print "\n---[ New parameter " + fuzz + " for url: " + url + " ]---"
+			print "\n---[ GET - New parameter " + fuzz + " for url: " + url + " ]---"
 			scan_xss(vulns, url, fuzz, cookies_ghost, useragent)
 			scan_lfi(vulns, url, fuzz, cookies_requests, useragent)
 			scan_sql_error(vulns, url, fuzz, cookies_requests, useragent)
 			scan_sql_blind_time(vulns, url, fuzz, cookies_requests, useragent)
 			scan_rce(vulns, url, fuzz, cookies_requests, useragent)
+
+	# Parse args for POST
+	if data != '':
+
+		# Parse document.cookie for Ghost and Requests
+		cookies_requests = {} #dict
+		cookies_ghost    = "" #string header
+		for cookie in args['cookies'].split(';'):
+			c = cookie.split('=')
+			if c != '' and c != None:
+				if len(c) != 1:
+					name = c[0]
+					value = c[1]
+					cookies_requests[name] = value
+					cookies_ghost += " "+cookie.replace('name:','').replace('value:','=').replace('|','') + ";"
+
+		# DEBUG
+		print cookies_requests
+		print cookies_ghost
+
+		# TODO parse POST data
+		fuzz = data
+		print "\n---[ POST - New parameter |" + fuzz + "| for url: " + url + " ]---"
+
 
 	# Display results as a json
 	return jsonify(vulns)

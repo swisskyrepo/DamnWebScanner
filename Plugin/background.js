@@ -25,9 +25,9 @@ function extract_domain(url){
  * @param string(impact) - aggressivity of the scan from 0 to 5
  *
  */
-function send_target(server, url, deep, impact, cookies){
+function send_target(server, url, deep, impact, cookies, method, data){
     var http = new XMLHttpRequest();
-    infos = server + "/?url=" + url + "&deep="+ deep + "&impact=" + impact + "&cookies=" + cookies + "&useragent=" + navigator.userAgent;
+    infos = server + "/?url=" + url + "&deep="+ deep + "&impact=" + impact + "&cookies=" + cookies + "&useragent=" + navigator.userAgent + "&method=" + method + "&data="+ data;
 
     // Display the informations sent by the scanner
     http.onreadystatechange = function() {
@@ -86,10 +86,46 @@ function send_target(server, url, deep, impact, cookies){
 chrome.storage.sync.set({'rce':0, 'xss': 0, 'sql': 0, 'lfi': 0, 'work': 0, 'list':'' })
 
 
+
+
+// Handle POST scan
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if (request.type == "scan_plz" && request.data != ''){
+
+      // Start a POST scan with the url and the cookies
+      send_target(config_server, escape(request.url), 0, 0, escape(request.cookie), 'POST', escape(request.data));
+    }
+});
+
+
 // Launch a scan when the tab change - Submit a form / Open new URL from bar 
 chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
-  
   if(changeInfo.status == 'complete'){
+
+    // Inject this function into the page to catch a submit event for every forms
+    function inject_onsubmit(){
+      for (var i = 0; i < document.forms.length ; i++) {
+          document.forms[i].addEventListener('submit', function(){
+            
+            // Detect value of inputs of the form
+            post_data = ''; 
+            for (var j = 0; j < document.forms[i-1].elements.length -1; j++) {
+              post_data += (document.forms[i-1].elements[j].name+":"+document.forms[i-1].elements[j].value+"|");
+            }
+
+            // Send data to this plugin (POST Scan)
+            if(post_data != ''){
+              console.log(post_data);
+              chrome.runtime.sendMessage({type: "scan_plz", data:post_data, url:document.location.href, cookie:document.cookie}, function() {});
+            }
+        });
+      } 
+    }
+    chrome.tabs.executeScript({code: '(' + inject_onsubmit + ')();'}, (results) => {});
+
+
+    // Get the information of the updated tab
     chrome.tabs.get(tabId, function(tab){
 
       // Handle start/stop button
@@ -99,17 +135,19 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
           // Extract cookies from the domain
           var cookies_string = "";  
           chrome.cookies.getAll({ 'domain': extract_domain(tab.url)}, function(cookies) {
+           
+            // Custom cookie string with all cookies from the domain
             for (var i = 0; i < cookies.length; i++) {
              cookies_string += ("name:" + cookies[i].name + "|value:" + cookies[i].value+"\n");
             }
 
-            // Start a scan with the url and the cookies
-            send_target(config_server, escape(tab.url), 0, 0, escape((cookies_string)) );
+            // Start a GET scan with the url and the cookies
+            send_target(config_server, escape(tab.url), 0, 0, escape(cookies_string), 'GET', '');
+          
           });
         }
-
       });
+
     });
   }
-  
 });
