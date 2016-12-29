@@ -53,7 +53,7 @@ You can try the Error SQL, Blind SQL, LFI with Damn Vulnerable Web App
 - Should detect and work with POST requests
 - all scans will be in another file, scans.py, (get_scan, post_scan)
 - Bug fix list in TimeBased 
-- Do scan_blabla for POST with data dict
+- Do scan_rce/xss/bsqli for POST with data dict
 
 ## Thanks
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)
