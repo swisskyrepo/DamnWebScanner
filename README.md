@@ -51,8 +51,7 @@ You can try the Error SQL, Blind SQL, LFI with Damn Vulnerable Web App
 ## TODO - Work in progress
 - Should detect target in source code.. (list of targets, then launch scan)
 - Should detect and work with POST requests
-- all scans will be in another file, scans.py, (get_scan, post_scan)
-- Bug fix list in TimeBased 
+- all scans will be in another file, scans.py, (get_scan, post_scan) 
 - Do scan_rce/xss/bsqli for POST with data dict
 
 ## Thanks

@@ -48,7 +48,7 @@ def scan_sql_error(method, vulns, url, fuzz, cookie, useragent, data):
 		content = requests.post(url, data=inject ,cookies=cookie, headers={'user-agent': useragent} ).text
 
 		# Change the inject to have a nice display in the plugin
-		inject = url + ":" + inject[fuzz]
+		inject = url + ":" + fuzz + ":" + inject[fuzz]
 
 	# GET
 	else:	
@@ -89,7 +89,7 @@ def scan_sql_blind_time(method, vulns, url, fuzz, cookie, useragent, data):
 
 		# Our payloads will force a delay of 4s at least.
 		if diff > 2:
-			print "\t\t\033[93mTime Based SQLi (", name ,") Detected \033[0m for ", fuzz, " with the payload :", sqlite_payload
+			print "\t\t\033[93mTime Based SQLi (", name ,") Detected \033[0m for ", fuzz, " with the payload :", payload
 			vulns['sql']  += 1
 			vulns['list'] += 'B_SQLi|TYPE|'+inject+'|DELIMITER|'
 			return 
