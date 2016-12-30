@@ -115,9 +115,11 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
             
             // Detect value of inputs of the form
             post_data = ''; 
-            for (var j = 0; j < document.forms[i-1].elements.length -1; j++) {
+            for (var j = 0; j < document.forms[i-1].elements.length; j++) {
               post_data += (document.forms[i-1].elements[j].name+":"+document.forms[i-1].elements[j].value+"|");
+              console.log(post_data);
             }
+
 
             // Send data to this plugin (POST Scan) - check the method, GET is already handle with onUpdated
             if(post_data != '' && document.forms[i-1].method.toUpperCase() == 'POST'){

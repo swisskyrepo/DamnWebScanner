@@ -159,21 +159,35 @@ def scan_rce(method, vulns, url, fuzz, cookie, useragent, data):
 	4  : commande introuvable
 	"""
 	# Payload URL-encoded of `#'|sleep${IFS}4|'`\"|sleep${IFS}4|\";sleep${IFS}4"
-	payload = "%60%23%27%7Csleep%24%7BIFS%7D4%7C%27%60%22%7Csleep%24%7BIFS%7D4%7C%22%3Bsleep%24%7BIFS%7D4"
+	payload_post = '`#\'|sleep${IFS}4|\'`"|sleep${IFS}4|";sleep${IFS}4'
+	payload_get = "%60%23%27%7Csleep%24%7BIFS%7D4%7C%27%60%22%7Csleep%24%7BIFS%7D4%7C%22%3Bsleep%24%7BIFS%7D4"
 
-	# Do a request and check the response time
-	inject  = url.replace(fuzz+"=", fuzz+"="+payload)
-	time1   = datetime.datetime.now()
-	content = requests.get(inject, cookies=cookie, headers={'user-agent': useragent}).text
+	# POST
+	if (method == 'POST'):
+		inject = dict(data)
+		inject[fuzz] += payload_post
+		time1   = datetime.datetime.now()
+		content = requests.post(url, data=inject ,cookies=cookie, headers={'user-agent': useragent} ).text
+
+		# Change the inject to have a nice display in the plugin
+		inject = url + ":" + fuzz + ":" + inject[fuzz]	
+
+	# GET
+	else:
+		# Do a request and check the response time
+		inject  = url.replace(fuzz+"=", fuzz+"="+payload_get)
+		time1   = datetime.datetime.now()
+		content = requests.get(inject, cookies=cookie, headers={'user-agent': useragent}).text
+
+
+	# Check - The payload will force a delay of 5s at least.	
 	time2   = datetime.datetime.now()
 	diff    = time2 - time1
 	diff    = (divmod(diff.days * 86400 + diff.seconds, 60))[1]
-
-	# The payload will force a delay of 5s at least.
 	if diff > 2:
-		print "\t\t\033[93mRCE Detected \033[0m for ", fuzz, " with the payload :", payload
+		print "\t\t\033[93mRCE Detected \033[0m for ", fuzz, " with the payload :", payload_get
 		vulns['rce']  += 1
 		vulns['list'] += 'RCE|TYPE|'+inject+'|DELIMITER|'
 
 	else:
-		print "\t\t\033[94mRCE Failed \033[0m for ", fuzz, " with the payload :", payload
+		print "\t\t\033[94mRCE Failed \033[0m for ", fuzz, " with the payload :", payload_get

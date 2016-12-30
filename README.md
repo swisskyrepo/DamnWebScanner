@@ -50,7 +50,7 @@ You can try the Error SQL, Blind SQL, LFI with Damn Vulnerable Web App
 
 ## TODO - Work in progress
 - Should detect target in source code.. (list of targets, then launch scan)
-- Do scan_rce/xss for POST with data dict
+- Do xss for POST with data dict
 
 ## Thanks
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)
