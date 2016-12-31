@@ -8,6 +8,18 @@ Currently it scans for:
 - Local File Inclusion
 - Remote Commands Execution
 
+All the features are:
+- Detect if the server is up
+- Start/Stop button
+- New XSS vectors, work in different contexts (JS var, JS function, inside HTML tag, outside HTML tag)
+- Basic page to list the vulnerabilities URL and TYPE
+- Time based SQLi scanner using polyglot vectors (MySQL, SQLite, Oracle, Postgresql, SQL Server)
+- RCE scanner using polyglot vectors based on time
+- New logo for the extension
+- Re-use your cookies and user-agent to get access to page with cookie-authentication 
+- Export vulnerabilities into a CSV file
+- Launch scan when a form is submitted or a page is opened via the URL bar
+
 **Warnings :** Do not use this extension for illegal purpose, the main goal of it is to simplify the life of bug hunters. It's a **BETA version**, many improvements will come don't worry
 
 ## Install
@@ -35,22 +47,6 @@ var config_server = "http://127.0.0.1:8000";
 ```
 4 - Browse the internet ! (Don't forget to start the extension by clicking the 'START' button)
 You can try the Error SQL, Blind SQL, LFI with Damn Vulnerable Web App 
-
-## New features
-- Detect if the server is up
-- Start/Stop button
-- New XSS vectors, work in different contexts (JS var, JS function, inside HTML tag, outside HTML tag)
-- Basic page to list the vulnerabilities URL and TYPE
-- Time based SQLi scanner using polyglot vectors (MySQL, SQLite, Oracle, Postgresql, SQL Server)
-- RCE scanner using polyglot vectors based on time
-- New logo for the extension
-- Re-use your cookies and user-agent to get access to page with cookie-authentication 
-- Export vulnerabilities into a CSV file
-- Launch scan when a form is submitted or a page is opened via the URL bar
-
-## TODO - Work in progress
-- Should detect target in source code.. (list of targets, then launch scan)
-- Do xss for POST with data dict
 
 ## Thanks
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)
