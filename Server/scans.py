@@ -12,7 +12,6 @@ Parameters: vulns - list of vulnerabilities, url - address of the target, fuzz -
 """
 def scan_xss(method, vulns, url, fuzz, cookie, useragent, firefox, data):
 	payload = 'jaVasCript:alert(1)//" name=alert(1) onErrOr=eval(name) src=1 autofocus oNfoCus=eval(name)><marquee><img src=x onerror=alert(1)></marquee>" ></textarea\></|\><details/open/ontoggle=prompt`1` ><script>prompt(1)</script>@gmail.com<isindex formaction=javascript:alert(/XSS/) type=submit>\'-->" ></script><sCrIpt>confirm(1)</scRipt>"><img/id="confirm&lpar; 1)"/alt="/"src="/"onerror=eval(id&%23x29;>\'"><!--'
-	print repr(fuzz),"fuzz"
 	try:	
 		with firefox.start() as session:
 
@@ -36,15 +35,15 @@ def scan_xss(method, vulns, url, fuzz, cookie, useragent, firefox, data):
 
 			# Detect XSS result with an alert
 			if result == '1':
-				print "\t\t\033[93mXSS Detected \033[0m for ", fuzz, " with the payload :", payload
+				print "\t\t\033[93mXSS Detected\033[0m for ", fuzz, " with the payload :", payload
 				vulns['xss']  += 1
 				vulns['list'] += 'XSS|TYPE|'+inject+'|DELIMITER|'
 			else:
 				print "\t\t\033[94mXSS Failed \033[0m for ", fuzz, " with the payload :", payload
 
 	except Exception, e:
-		if "alert" in str(e):
-			print "\t\t\033[93mXSS Detected \033[0m for ", fuzz, " with the payload :", payload
+		if "confirm" in str(e) : #or "alert" in str(e):
+			print "\t\t\033[93mXSS Detected (False positive ?)\033[0m for ", fuzz, " with the payload :", payload
 			inject = url + ":" + fuzz + ":" + payload
 			vulns['xss']  += 1
 			vulns['list'] += 'XSS|TYPE|'+inject+'|DELIMITER|'

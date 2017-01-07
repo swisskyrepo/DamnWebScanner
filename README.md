@@ -41,6 +41,7 @@ If you have any trouble with Ghost you should have a look to the documentation :
 chmod +x ./launch
 ./launch
 ```
+Note: if Gunicorn fail you should launch the "server.py" instead
 3 - Edit the server configuration in popup.js and background.js with your server's informations
 ```
 var config_server = "http://127.0.0.1:8000";
@@ -52,3 +53,7 @@ You can try the Error SQL, Blind SQL, LFI with Damn Vulnerable Web App
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)
 - Polyglot vector for XSS injection 1 [One vector to rule them all](http://www.thespanner.co.uk/2010/09/15/one-vector-to-rule-them-all/)
 - Polyglot vector for XSS injection 2 [Unleashing an Ultimate XSS Polyglot](https://github.com/0xsobky/HackVault/wiki/Unleashing-an-Ultimate-XSS-Polyglot)
+
+# TODO
+- Verify=False in requests..
+- OpenURL redirect ?

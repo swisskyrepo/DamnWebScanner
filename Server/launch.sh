@@ -1,1 +1,1 @@
-gunicorn --workers=3 server:app --timeout 90
+gunicorn --workers=3 server:app --timeout 360

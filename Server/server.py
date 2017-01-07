@@ -103,4 +103,4 @@ def index():
 	return jsonify(vulns)
 
 if __name__ == '__main__':
-	app.run(port=8000, threaded=True, passthrough_errors=False)
+	app.run(host='0.0.0.0', port=8000, threaded=True, passthrough_errors=False)
