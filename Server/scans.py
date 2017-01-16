@@ -207,4 +207,4 @@ def scan_rce(method, vulns, url, fuzz, cookie, useragent, data):
 		vulns['list'] += 'RCE|TYPE|'+inject+'|DELIMITER|'
 
 	else:
-		print "\t\t\033[94mRCE Failed \033[0m for ", fuzz, " with the payload :", payload_get
+		print "\t\t\033[94mRCE Failed \033[0m for ", fuzz, " with the payload :", payload_post

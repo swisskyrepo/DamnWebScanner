@@ -55,5 +55,4 @@ You can try the Error SQL, Blind SQL, LFI with Damn Vulnerable Web App
 - Polyglot vector for XSS injection 2 [Unleashing an Ultimate XSS Polyglot](https://github.com/0xsobky/HackVault/wiki/Unleashing-an-Ultimate-XSS-Polyglot)
 
 # TODO
-- Verify=False in requests..
 - OpenURL redirect ?
