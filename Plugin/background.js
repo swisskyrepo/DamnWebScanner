@@ -2,7 +2,7 @@ var config_server = "http://127.0.0.1:8000";
 
 /**
  * Extract the domain from an URL
- * @param string(url) - url of the target which will be shorten	
+ * @param string(url) - url of the target which will be shorten
  */
 function extract_domain(url){
     var domain;
@@ -47,12 +47,12 @@ function send_target(server, url, deep, impact, cookies, method, data){
            chrome.storage.sync.set({'list': items['list']+http_data.list})
         });
 
-        // Notifications 
+        // Notifications
         if (http_data.xss != '0'){
           new Notification('New vulnerability detected !', {
             icon: 'icon.png',
             body: 'XSS on '+extract_domain(unescape(url))
-          })();  
+          })();
         }
 
         if (http_data.sql != '0'){
@@ -104,7 +104,7 @@ chrome.runtime.onMessage.addListener(
 });
 
 
-// Launch a scan when the tab change - Submit a form / Open new URL from bar 
+// Launch a scan when the tab change - Submit a form / Open new URL from bar
 chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
   if(changeInfo.status == 'complete'){
 
@@ -112,9 +112,9 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
     function inject_onsubmit(){
       for (var i = 0; i < document.forms.length ; i++) {
           document.forms[i].addEventListener('submit', function(){
-            
+
             // Detect value of inputs of the form
-            post_data = ''; 
+            post_data = '';
             for (var j = 0; j < document.forms[i-1].elements.length; j++) {
               post_data += (document.forms[i-1].elements[j].name+":"+document.forms[i-1].elements[j].value+"|");
               console.log(post_data);
@@ -126,7 +126,7 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
               chrome.runtime.sendMessage({type: "scan_plz", data:post_data, url:document.location.href, cookie:document.cookie}, function() {});
             }
         });
-      } 
+      }
     }
     chrome.tabs.executeScript({code: '(' + inject_onsubmit + ')();'}, (results) => {});
 
@@ -139,9 +139,9 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
         if(items['work'] == 1){
 
           // Extract cookies from the domain
-          var cookies_string = "";  
+          var cookies_string = "";
           chrome.cookies.getAll({ 'domain': extract_domain(tab.url)}, function(cookies) {
-           
+
             // Custom cookie string with all cookies from the domain
             for (var i = 0; i < cookies.length; i++) {
              cookies_string += ("name:" + cookies[i].name + "|value:" + cookies[i].value+"\n");
@@ -149,7 +149,7 @@ chrome.tabs.onUpdated.addListener(function(tabId,changeInfo, tab) {
 
             // Start a GET scan with the url and the cookies
             send_target(config_server, escape(tab.url), 0, 0, escape(cookies_string), 'GET', '');
-          
+
           });
         }
       });

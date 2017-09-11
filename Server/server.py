@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, request, jsonify
 from ghost import Ghost
-from scans import * 
+from scans import *
 import requests
 import datetime
 import re
@@ -24,7 +24,7 @@ Description: main route for the flask application, every scan is launched from h
 @app.route('/',methods=['GET'])
 def index():
 	vulns = {'rce': 0, 'xss': 0, 'sql': 0, 'lfi': 0, 'list':''}
-	
+
 	# Parse requests - extract arguments
 	args          = request.args
 	url           = args['url']
@@ -52,7 +52,7 @@ def index():
 					cookies_requests[name] = value
 					cookies_ghost += " "+cookie.replace('name:','').replace('value:','=').replace('|','') + ";"
 
-		# Parse GET data (in url)	
+		# Parse GET data (in url)
 		params  = url.split('?')[1]
 		regex   = re.compile('([a-zA-Z0-9\-_]*?)=')
 		matches = regex.findall(params)
@@ -91,13 +91,13 @@ def index():
 
 	# Launch scans - iterate through all parameters
 	for fuzz in matches:
-		print "\n---[ " + method + " - New parameter " + fuzz + " for url: " + url + " ]---"
+		print ("\n---[ " + method + " - New parameter " + fuzz + " for url: " + url + " ]---")
 		scan_xss(method, vulns, url, fuzz, cookies_ghost, useragent, firefox, data_requests)
 		scan_lfi(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
 		scan_sql_error(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
 		scan_sql_blind_time(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
 		scan_rce(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
-	
+
 
 	# Display results as a json
 	return jsonify(vulns)
