@@ -5,24 +5,20 @@ The extension is working on the background and will notify you if it finds any v
 ![Image of a noticiation](https://github.com/swisskyrepo/DamnWebScanner/blob/master/Screens/Notification.png?raw=true)
 
 Currently it scans for:
-- SQL Injection
-- Cross Site Scripting
+- SQL Injection : Time based SQLi scanner using polyglot vectors (MySQL, SQLite, Oracle, Postgresql, SQL Server)
+- Cross Site Scripting : Using a browser simulator (Ghost)
 - Local File Inclusion
-- Remote Commands Execution
+- Remote Commands Execution using polyglot vectors based on time
 
 All the features are:
 - Detect if the server is up with a "/ping" request
 - New XSS vectors, work in different contexts (JS var, JS function, inside HTML tag, outside HTML tag)
 - Basic page to list the vulnerabilities URL and TYPE
-- Time based SQLi scanner using polyglot vectors (MySQL, SQLite, Oracle, Postgresql, SQL Server)
-- RCE scanner using polyglot vectors based on time
 - Re-use your cookies and user-agent to get access to page with cookie-authentication
 - Export vulnerabilities into a CSV file
 - Launch scan when a form is submitted or a page is opened via the URL bar
 
 **Warning :** Do not use this extension for illegal purpose, the main goal of it is to simplify the life of bug hunters. It's a **BETA version**, many improvements will come don't worry
-
-**Warning 2:** XSS Scanner seems to be broken due to an update in the Ghost lib. I'm working on a fix.
 
 ## Install
 You need to install and configure the server, it uses ghost and flask.

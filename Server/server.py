@@ -8,7 +8,6 @@ import datetime
 import re
 
 app     = Flask(__name__)
-firefox = Ghost()
 
 """ Route /ping
 Description: Simple ping implementation to check if the server is up via the extension
@@ -92,7 +91,7 @@ def index():
 	# Launch scans - iterate through all parameters
 	for fuzz in matches:
 		print ("\n---[ " + method + " - New parameter " + fuzz + " for url: " + url + " ]---")
-		scan_xss(method, vulns, url, fuzz, cookies_ghost, useragent, firefox, data_requests)
+		scan_xss(method, vulns, url, fuzz, cookies_ghost, useragent, data_requests)
 		scan_lfi(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
 		scan_sql_error(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
 		scan_sql_blind_time(method, vulns, url, fuzz, cookies_requests, useragent, data_requests)
