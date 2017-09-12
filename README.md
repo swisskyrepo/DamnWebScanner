@@ -2,6 +2,8 @@
 Another web vulnerabilities scanner, this extension works on Chrome and Opera.
 The extension is working on the background and will notify you if it finds any vulnerability.
 
+![Image of a noticiation](https://github.com/swisskyrepo/DamnWebScanner/blob/master/Screens/Notification.png?raw=true)
+
 Currently it scans for:
 - SQL Injection
 - Cross Site Scripting
@@ -18,9 +20,9 @@ All the features are:
 - Export vulnerabilities into a CSV file
 - Launch scan when a form is submitted or a page is opened via the URL bar
 
-**Warnings :** Do not use this extension for illegal purpose, the main goal of it is to simplify the life of bug hunters. It's a **BETA version**, many improvements will come don't worry
+**Warning :** Do not use this extension for illegal purpose, the main goal of it is to simplify the life of bug hunters. It's a **BETA version**, many improvements will come don't worry
 
-**Warnings 2:** XSS Scanner seems to be broken due to an update in the Ghost lib. I'm working on a fix.
+**Warning 2:** XSS Scanner seems to be broken due to an update in the Ghost lib. I'm working on a fix.
 
 ## Install
 You need to install and configure the server, it uses ghost and flask.
@@ -40,8 +42,10 @@ var config_server = "http://127.0.0.1:8000";
 
 4. Browse the internet ! (Don't forget to start the extension by clicking the 'START' button)
 
+
 You can try the Error SQL, Blind SQL, LFI with Damn Vulnerable Web App.
-The SQL Injection scanner was also tested on https://pentesterlab.com/badges/essential.
+The SQL Injection scanner was also tested on https://pentesterlab.com/badges/essential.    
+![Image of DVWA Result](https://github.com/swisskyrepo/DamnWebScanner/blob/master/Screens/Results%20DVWA.png?raw=true)
 
 
 ## Debugging
@@ -56,7 +60,7 @@ STDOUT
 ---[ POST - New parameter rememberme for url: http://[REDACTED]/login.php ]---
 		[94mXSS Failed [0m for  rememberme  with the payload : jaVasCript:alert(1)//" name=alert(1) ]'"><!--
 		[94mLFI Failed [0m for  rememberme  with the payload : /etc/passwd
-		[94mSQLi Failed [0m for  rememberme  with the payload : '
+		[94mSQLi Detected [0m for  rememberme  with the payload : '
 		[94mTime Based SQLi ( MySQL ) Failed [0m for  rememberme  with the payload : SLEEP(4) /*' || SLEEP(4) || '" || SLEEP(4) || "*/
 		[94mTime Based SQLi ( SQLite ) Failed [0m for  rememberme  with the payload : substr(upper(hex(randomblob(55555555))),0,1) /[*' or substr(upper(hex(randomblob(55555555))),0,1) or '" or substr(upper(hex(randomblob(55555555)])),0,1) or "*/
 		[94mTime Based SQLi ( PostgreSQL ) Failed [0m for  rememberme  with the payload : (SELECT 55555555 FROM PG_SLEEP(4)) /*' || (SELECT 55555555 FROM PG_SLEEP(4)) || '" || (SELECT 55555555 FROM PG_SLEEP(4)) || "*/
