@@ -17,6 +17,14 @@ def ping():
 	return "pong"
 
 
+""" Template
+Description: Basic template, will be used in the next features
+"""
+@app.route('/template', methods=['GET', 'POST'])
+def template():
+        return render_template('index.html')
+
+
 """ Route /
 Description: main route for the flask application, every scan is launched from here
 """
@@ -102,4 +110,4 @@ def index():
 	return jsonify(vulns)
 
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=8000, threaded=True, passthrough_errors=False)
+	app.run(host='0.0.0.0', port=8000, threaded=True, passthrough_errors=True) # Seems to crash the server with the following options, threaded=True, passthrough_errors=False)

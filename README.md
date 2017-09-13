@@ -20,6 +20,8 @@ All the features are:
 
 **Warning :** Do not use this extension for illegal purpose, the main goal of it is to simplify the life of bug hunters. It's a **BETA version**, many improvements will come don't worry
 
+**Warning :** A crash can happen server-side, this issue isn't resolved yet. The docker-compose.yml is set to automatically restart the docker when this happen..
+
 ## Install
 You need to install and configure the server, it uses ghost and flask.
 1. To get started you only need to start the docker and the dependencies will be installed.
@@ -71,6 +73,13 @@ STDERR
 172.30.0.1 - - [11/Sep/2017 16:19:16] "GET /ping HTTP/1.1" 200 -
 ```
 A "/ping" request is done at every opening of the "Plugin Window" in your browser.
+
+If you need the exact version of the component used in the beta test, here they are.
+```
+Ghost.py==2.0.0-dev   
+PySide==2.0.0~alpha0
+Qt==5.5.1
+```
 
 ## Thanks, Contributors and Ideas
 - Polyglot vector for SQL injections [The Ultimate SQL Injection Payload](https://labs.detectify.com/2013/05/29/the-ultimate-sql-injection-payload/)

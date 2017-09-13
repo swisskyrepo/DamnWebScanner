@@ -37,7 +37,7 @@ function getCurrentTab(callback) {
 
 /**
  * Extract the domain from an URL
- * @param string(url) - url of the target which will be shorten 
+ * @param string(url) - url of the target which will be shorten
  */
 function extract_domain(url){
     var domain;
@@ -62,7 +62,7 @@ function status_server(config_server){
     http.onreadystatechange = function() {
 
       if (http.readyState == XMLHttpRequest.DONE) {
-        
+
         // If the server is up it responds with "pong"
         if("pong" == http.responseText){
           document.getElementById('status').textContent = "Server is UP !";
@@ -78,7 +78,7 @@ function status_server(config_server){
     http.send();
 }
 
-        
+
 /**
  * Plugin form - Update and display the informations
  */
@@ -103,8 +103,8 @@ document.addEventListener('DOMContentLoaded', function() {
       // Display the list of vulns
       var vulns = escape(items['list']).split('%7CDELIMITER%7C')
       var i = 0;
-      vulns.forEach(function(y) 
-      { 
+      vulns.forEach(function(y)
+      {
           y = encodeURI(unescape(y));
           if(y!==''){
 
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
             vulns_csv += type+","+y+"\n";
             i++;
           }
-        
+
       }
       );
 
