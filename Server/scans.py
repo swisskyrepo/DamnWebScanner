@@ -16,7 +16,8 @@ def scan_xss(method, vulns, url, fuzz, cookie, useragent, data):
 	try:
 		ghost = Ghost()
 		x = ghost.start()
-
+		result = 0
+		
 		# POST
 		if (method == 'POST' and fuzz != ''):
 			inject = dict(data)
